@@ -1,0 +1,776 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>겹 · 시안 B — 묻지 않는 조율</title>
+<style>
+  :root{
+    --page:#F9FAFB; --paper:#FFFFFF;
+    --ink:#191F28; --ink2:#4E5968; --ink3:#8B95A1; --ink4:#B0B8C1;
+    --line:#E5E8EB; --fill:#F2F4F6; --fill2:#F9FAFB;
+    --blue:#3182F6; --blue-dn:#1B64DA; --blue-bg:#E8F3FF; --blue-ink:#1B64DA;
+    --red:#F04452; --red-bg:#FDEBEC;
+    --orange:#E8730A; --orange-bg:#FFF3E0;
+    --green:#00A05B; --green-bg:#E5F5EC;
+    --dim:rgba(0,23,51,.45);
+    --shadow:0 16px 40px rgba(0,27,55,.12);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --page:#101013; --paper:#17171C;
+      --ink:#E5E8EB; --ink2:#9EA4AA; --ink3:#6B7684; --ink4:#4E5968;
+      --line:#2C2C35; --fill:#26262C; --fill2:#1E1E24;
+      --blue:#4593FC; --blue-dn:#6FA9F7; --blue-bg:#16304F; --blue-ink:#7CB2FC;
+      --red:#F26B76; --red-bg:#3D1F24;
+      --orange:#F0A146; --orange-bg:#3A2B12;
+      --green:#3ECF8E; --green-bg:#123326;
+      --dim:rgba(0,0,0,.6);
+      --shadow:0 16px 40px rgba(0,0,0,.45);
+    }
+  }
+  :root[data-theme="light"]{
+    --page:#F9FAFB; --paper:#FFFFFF;
+    --ink:#191F28; --ink2:#4E5968; --ink3:#8B95A1; --ink4:#B0B8C1;
+    --line:#E5E8EB; --fill:#F2F4F6; --fill2:#F9FAFB;
+    --blue:#3182F6; --blue-dn:#1B64DA; --blue-bg:#E8F3FF; --blue-ink:#1B64DA;
+    --red:#F04452; --red-bg:#FDEBEC;
+    --orange:#E8730A; --orange-bg:#FFF3E0;
+    --green:#00A05B; --green-bg:#E5F5EC;
+    --dim:rgba(0,23,51,.45);
+    --shadow:0 16px 40px rgba(0,27,55,.12);
+  }
+  :root[data-theme="dark"]{
+    --page:#101013; --paper:#17171C;
+    --ink:#E5E8EB; --ink2:#9EA4AA; --ink3:#6B7684; --ink4:#4E5968;
+    --line:#2C2C35; --fill:#26262C; --fill2:#1E1E24;
+    --blue:#4593FC; --blue-dn:#6FA9F7; --blue-bg:#16304F; --blue-ink:#7CB2FC;
+    --red:#F26B76; --red-bg:#3D1F24;
+    --orange:#F0A146; --orange-bg:#3A2B12;
+    --green:#3ECF8E; --green-bg:#123326;
+    --dim:rgba(0,0,0,.6);
+    --shadow:0 16px 40px rgba(0,0,0,.45);
+  }
+
+  *,*::before,*::after{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  html{background:var(--page)}
+  [hidden]{display:none !important}
+  body{
+    background:var(--page); color:var(--ink);
+    font-family:"Toss Product Sans","Pretendard Variable",Pretendard,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",system-ui,sans-serif;
+    font-size:15px; line-height:1.6; -webkit-font-smoothing:antialiased;
+    word-break:keep-all; overflow-wrap:break-word;
+  }
+  button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+  button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:8px}
+  @media (prefers-reduced-motion: reduce){ *,*::before,*::after{transition:none !important;animation:none !important} }
+  .tn{font-variant-numeric:tabular-nums}
+
+  .demo-bar{
+    position:sticky;top:0;z-index:80;background:color-mix(in oklab, var(--page) 88%, transparent);
+    backdrop-filter:blur(10px);border-bottom:1px solid var(--line);
+  }
+  .demo-bar-in{max-width:1020px;margin:0 auto;padding:9px 24px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .db-label{font-size:11.5px;font-weight:800;letter-spacing:.08em;color:var(--ink3)}
+  .db-chips{display:flex;gap:5px;flex-wrap:wrap}
+  .db-chips button,.db-note{
+    font-size:12px;font-weight:600;color:var(--ink2);background:var(--paper);
+    border:1px solid var(--line);border-radius:999px;padding:4.5px 11px;transition:all .15s;text-decoration:none;
+  }
+  .db-chips button:hover,.db-note:hover{border-color:var(--blue);color:var(--blue)}
+  .db-note{margin-left:auto}
+
+  .wrap{max-width:1020px;margin:0 auto;padding:0 24px 96px}
+  .hero{padding:44px 0 28px;max-width:720px}
+  .eyebrow{font-size:12px;font-weight:700;letter-spacing:.14em;color:var(--blue);text-transform:uppercase}
+  .hero h1{margin:10px 0 10px;font-size:32px;line-height:1.3;font-weight:800;letter-spacing:-.02em;text-wrap:balance}
+  .hero p{margin:0;font-size:15.5px;color:var(--ink2);max-width:40em}
+  .hero-chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+  .hchip{font-size:12.5px;font-weight:600;color:var(--ink2);background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:5px 13px}
+  .hchip.b{color:var(--blue-ink);background:var(--blue-bg);border-color:transparent}
+
+  /* app */
+  .app{
+    background:var(--paper);border:1px solid var(--line);border-radius:24px;
+    box-shadow:var(--shadow);overflow:hidden;position:relative;
+  }
+  .topbar{display:flex;align-items:center;gap:14px;padding:14px 26px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .brand{display:flex;align-items:center;gap:9px;font-weight:800;font-size:16px}
+  .brand-mark{width:30px;height:30px;border-radius:9px;background:var(--blue);color:#fff;display:grid;place-items:center;font-size:15px;font-weight:800}
+  .brand .b-tag{font-size:11px;font-weight:800;color:var(--blue-ink);background:var(--blue-bg);border-radius:6px;padding:2px 8px}
+  .flow-hint{margin:0 auto;font-size:12.5px;color:var(--ink3);font-weight:600}
+  .reset-btn{font-size:12.5px;font-weight:600;color:var(--ink3)}
+  .reset-btn:hover{color:var(--ink2)}
+
+  .stage{position:relative;min-height:560px}
+  .screen{display:none;animation:scr-in .22s ease}
+  .screen.active{display:block}
+  @keyframes scr-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .narrow{max-width:600px;margin:0 auto;padding:44px 26px 52px}
+  .midcol{max-width:680px;margin:0 auto;padding:40px 26px 52px}
+
+  .h-title{font-size:26px;font-weight:800;line-height:1.35;letter-spacing:-.02em;margin:0 0 8px;text-wrap:balance}
+  .h-sub{font-size:14.5px;color:var(--ink2);margin:0 0 24px;line-height:1.65}
+  .h-sub b{color:var(--ink);font-weight:600}
+  .cta{
+    height:54px;border-radius:15px;background:var(--blue);color:#fff;font-size:16px;font-weight:700;
+    width:100%;transition:transform .08s, background .15s;margin-top:26px;
+  }
+  .cta:hover:not(:disabled){background:var(--blue-dn)}
+  .cta:active:not(:disabled){transform:scale(.99)}
+  .cta:disabled{background:var(--fill);color:var(--ink4);cursor:default}
+  .cta-sub{width:100%;text-align:center;font-size:13px;font-weight:600;color:var(--ink3);padding:12px 8px 0}
+  .cta-sub:hover{color:var(--blue)}
+
+  .field-label{font-size:13px;font-weight:700;color:var(--ink3);margin:0 0 9px}
+  .f-sec{margin-bottom:28px}
+  .text-field{
+    width:100%;border:none;border-bottom:2px solid var(--line);background:none;color:var(--ink);
+    font-size:20px;font-weight:700;padding:8px 2px;font-family:inherit;
+  }
+  .text-field:focus{outline:none;border-color:var(--blue)}
+  .chip-row{display:flex;gap:8px;flex-wrap:wrap}
+  .chip{
+    padding:10px 16px;border-radius:12px;background:var(--fill);color:var(--ink2);
+    font-size:14.5px;font-weight:600;border:1.5px solid transparent;
+  }
+  .chip[aria-pressed="true"]{background:var(--blue-bg);color:var(--blue-ink);border-color:var(--blue)}
+  .chip:disabled{opacity:.45;cursor:default}
+  .rule-note{
+    display:flex;gap:9px;background:var(--fill2);border-radius:13px;padding:13px 15px;
+    font-size:12.5px;color:var(--ink2);line-height:1.65;margin-top:14px;
+  }
+  .rule-note .ic{flex:none;width:18px;height:18px;border-radius:50%;background:var(--blue-bg);color:var(--blue-ink);display:grid;place-items:center;font-size:11px;font-weight:800;margin-top:2px}
+
+  .p-list{display:flex;flex-direction:column}
+  .p-row{display:flex;align-items:center;gap:13px;padding:10px 0}
+  .avatar{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;flex:none;font-weight:700;font-size:14px;color:#fff}
+  .avatar.sm{width:30px;height:30px;font-size:11.5px}
+  .p-info{flex:1;min-width:0}
+  .p-nm{font-size:14.5px;font-weight:700;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+  .p-me{font-size:10.5px;font-weight:700;color:var(--blue-ink);background:var(--blue-bg);border-radius:5px;padding:1px 6px}
+  .p-jb{font-size:12px;color:var(--ink3)}
+  .seg{display:flex;background:var(--fill);border-radius:10px;padding:2.5px;flex:none}
+  .seg button{padding:6px 13px;border-radius:8px;font-size:12px;font-weight:700;color:var(--ink3)}
+  .seg button[aria-pressed="true"]{background:var(--paper);color:var(--blue);box-shadow:0 1px 4px rgba(0,0,0,.14)}
+  .seg.locked button[aria-pressed="true"]{color:var(--ink2)}
+
+  /* propose */
+  .prop-card{
+    background:var(--blue-bg);border-radius:18px;padding:22px 24px;margin-bottom:14px;
+  }
+  .prop-k{font-size:12px;font-weight:800;color:var(--blue-ink);letter-spacing:.06em;margin-bottom:6px}
+  .prop-time{font-size:26px;font-weight:800;letter-spacing:-.02em}
+  .prop-time span{font-size:16px;font-weight:600;color:var(--blue-ink);margin-right:8px}
+  .prop-why{font-size:13.5px;color:var(--blue-ink);font-weight:600;margin-top:6px}
+  .backup-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:26px}
+  @media (max-width:640px){ .backup-row{grid-template-columns:1fr} }
+  .backup{
+    background:var(--fill2);border:1px solid var(--line);border-radius:14px;padding:13px 16px;
+    font-size:13px;color:var(--ink2);
+  }
+  .backup b{display:block;color:var(--ink);font-size:14.5px;margin-bottom:2px}
+  .sig-label{font-size:13px;font-weight:700;color:var(--ink3);margin:0 0 10px}
+  .signals{display:flex;flex-direction:column;gap:8px}
+  .sig{
+    display:flex;gap:12px;align-items:flex-start;background:var(--paper);border:1px solid var(--line);
+    border-radius:14px;padding:13px 15px;
+  }
+  .sig .avatar{margin-top:1px}
+  .sig-body{flex:1;min-width:0}
+  .sig-t{font-size:13.5px;font-weight:700;line-height:1.5}
+  .sig-m{font-size:12px;color:var(--ink3);margin-top:3px;line-height:1.55}
+  .sig-tag{font-size:10.5px;font-weight:800;border-radius:5px;padding:2px 7px;flex:none;margin-top:2px}
+  .sig-tag.cal{color:var(--blue-ink);background:var(--blue-bg)}
+  .sig-tag.infer{color:var(--orange);background:var(--orange-bg)}
+  .conf{display:inline-block;font-size:10.5px;font-weight:700;border-radius:4px;padding:0 5px;margin-left:5px}
+  .conf.hi{color:var(--green);background:var(--green-bg)}
+  .conf.md{color:var(--orange);background:var(--orange-bg)}
+  .conf.lo{color:var(--ink3);background:var(--fill)}
+
+  /* experience (수민 viewpoint) */
+  .msg-wrap{max-width:440px;margin:0 auto}
+  .msg-app{
+    background:var(--fill2);border:1px solid var(--line);border-radius:18px;padding:16px;
+  }
+  .msg-from{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink3);font-weight:600;margin-bottom:10px}
+  .msg-from .brand-mark{width:22px;height:22px;border-radius:7px;font-size:11px}
+  .msg-card{
+    background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:18px 19px;
+  }
+  .msg-title{font-size:15.5px;font-weight:800}
+  .msg-time{font-size:18px;font-weight:800;color:var(--blue-ink);margin:6px 0 2px}
+  .msg-time span{font-size:13.5px;font-weight:600;color:var(--ink2);margin-right:6px}
+  .msg-note{font-size:12.5px;color:var(--ink3);line-height:1.6;margin:8px 0 14px}
+  .msg-note b{color:var(--ink2)}
+  .msg-btns{display:flex;gap:8px}
+  .msg-ok{flex:1;height:44px;border-radius:11px;background:var(--fill);font-size:14px;font-weight:700;color:var(--ink2)}
+  .msg-ok:hover{background:var(--line)}
+  .msg-no{flex:1;height:44px;border-radius:11px;background:var(--paper);border:1.5px solid var(--red);color:var(--red);font-size:14px;font-weight:700}
+  .msg-no:hover{background:var(--red-bg)}
+  .reason-box{margin-top:14px;border-top:1px solid var(--line);padding-top:14px}
+  .reason-box .field-label{margin-bottom:8px}
+  .reason-chips{display:flex;gap:6px;flex-wrap:wrap}
+  .rchip{
+    font-size:12.5px;font-weight:600;color:var(--ink2);border:1.5px solid var(--line);
+    border-radius:999px;padding:6px 12px;
+  }
+  .rchip[aria-pressed="true"]{border-color:var(--orange);color:var(--orange);background:var(--orange-bg)}
+  .msg-send{width:100%;height:46px;border-radius:11px;background:var(--ink);color:var(--paper);font-size:14px;font-weight:700;margin-top:12px}
+  .exp-note{font-size:12.5px;color:var(--ink3);text-align:center;margin-top:14px;line-height:1.6}
+
+  /* timeline */
+  .tl{display:flex;flex-direction:column;position:relative;margin-top:4px}
+  .tl::before{content:"";position:absolute;left:15px;top:8px;bottom:8px;width:2px;background:var(--line)}
+  .tl-item{display:flex;gap:14px;padding:9px 0;position:relative;animation:tl-in .3s ease}
+  @keyframes tl-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .tl-dot{
+    width:32px;height:32px;border-radius:50%;flex:none;display:grid;place-items:center;
+    background:var(--fill);color:var(--ink2);font-size:12.5px;font-weight:800;z-index:1;
+    border:2px solid var(--paper);
+  }
+  .tl-dot.sys{background:var(--blue);color:#fff}
+  .tl-dot.ok{background:var(--green-bg);color:var(--green)}
+  .tl-dot.no{background:var(--orange-bg);color:var(--orange)}
+  .tl-body{flex:1;min-width:0;padding-top:3px}
+  .tl-t{font-size:13.5px;font-weight:700;line-height:1.5}
+  .tl-m{font-size:12.5px;color:var(--ink2);line-height:1.6;margin-top:2px}
+  .tl-when{font-size:11px;color:var(--ink4);margin-top:3px}
+  .tl-cardline{background:var(--fill2);border:1px solid var(--line);border-radius:12px;padding:10px 13px;margin-top:6px;font-size:12.5px;color:var(--ink2);line-height:1.6}
+  .tl-cardline b{color:var(--ink)}
+  .skip-btn{
+    margin-top:18px;width:100%;height:48px;border-radius:13px;border:1.5px solid var(--line);
+    font-size:14px;font-weight:700;color:var(--ink2);
+  }
+  .skip-btn:hover{border-color:var(--blue);color:var(--blue)}
+  .deadline-chip{
+    display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--ink2);
+    background:var(--fill);border-radius:999px;padding:5px 12px;margin-bottom:16px;
+  }
+  .deadline-chip i{width:7px;height:7px;border-radius:50%;background:var(--orange);display:inline-block}
+
+  /* done */
+  .done-body{display:flex;flex-direction:column;align-items:center;text-align:center;padding:60px 26px 56px;max-width:560px;margin:0 auto}
+  .done-check{
+    width:78px;height:78px;border-radius:50%;background:var(--blue);display:grid;place-items:center;
+    animation:pop .35s cubic-bezier(.3,1.6,.5,1);margin-bottom:22px;
+  }
+  @keyframes pop{from{transform:scale(.4);opacity:0}}
+  .done-check svg{width:36px;height:36px;stroke:#fff;stroke-width:3.4;fill:none;stroke-linecap:round;stroke-linejoin:round}
+  .done-title{font-size:24px;font-weight:800;letter-spacing:-.02em}
+  .done-time{font-size:16px;font-weight:700;color:var(--blue-ink);margin-top:7px}
+  .done-sub{font-size:13px;color:var(--ink2);margin-top:10px;line-height:1.65;max-width:32em}
+  .done-card{
+    width:100%;background:var(--fill2);border:1px solid var(--line);border-radius:16px;padding:16px 19px;margin-top:22px;
+    text-align:left;font-size:13.5px;color:var(--ink2);line-height:1.85;
+  }
+  .done-card b{color:var(--ink)}
+  .learn-card{
+    width:100%;background:var(--orange-bg);border-radius:16px;padding:15px 19px;margin-top:10px;
+    text-align:left;font-size:13px;color:var(--orange);line-height:1.7;font-weight:600;
+  }
+
+  .apptoast{
+    position:fixed;bottom:28px;left:50%;transform:translateX(-50%);z-index:120;
+    background:color-mix(in oklab, var(--ink) 92%, transparent);color:var(--paper);
+    font-size:13px;font-weight:600;padding:10px 18px;border-radius:999px;white-space:nowrap;
+    animation:toast-in .2s ease-out;box-shadow:var(--shadow);
+  }
+  @keyframes toast-in{from{opacity:0;transform:translateX(-50%) translateY(6px)}to{opacity:1;transform:translateX(-50%)}}
+
+  /* case study */
+  .case{max-width:720px;margin:0 auto}
+  .case-divider{display:flex;align-items:center;gap:14px;margin:72px auto 0;max-width:720px}
+  .case-divider::before,.case-divider::after{content:"";flex:1;height:1px;background:var(--line)}
+  .case-divider span{font-size:12px;font-weight:800;letter-spacing:.12em;color:var(--ink3)}
+  .sec{margin-top:56px}
+  .sec-no{font-size:12px;font-weight:800;letter-spacing:.12em;color:var(--blue)}
+  .sec h2{margin:8px 0 14px;font-size:23px;font-weight:800;letter-spacing:-.02em;line-height:1.35;text-wrap:balance}
+  .sec > p{margin:0 0 14px;color:var(--ink2);font-size:15px}
+  .sec b{color:var(--ink)}
+  .callout{
+    background:var(--paper);border:1px solid var(--line);border-left:3px solid var(--blue);
+    border-radius:12px;padding:16px 18px;font-size:14.5px;color:var(--ink2);margin:18px 0;line-height:1.7;
+  }
+  .callout b{color:var(--ink)}
+  .principles{display:flex;flex-direction:column;gap:8px;margin:18px 0}
+  .principle{display:flex;gap:13px;background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:15px 17px;font-size:14.5px}
+  .principle .no{font-weight:800;color:var(--blue);flex:none}
+  .principle b{display:block;margin-bottom:2px}
+  .principle span{color:var(--ink2);font-size:13.5px;line-height:1.65}
+  .hypos{display:flex;flex-direction:column;gap:10px;margin:18px 0}
+  .hypo{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+  .hypo .h-tag{display:inline-block;font-size:11.5px;font-weight:800;color:var(--blue-ink);background:var(--blue-bg);border-radius:6px;padding:2px 8px;margin-bottom:8px}
+  .hypo p{margin:0;font-size:14.5px;line-height:1.7}
+  .hypo .h-meta{margin-top:9px;font-size:12.5px;color:var(--ink3);display:flex;gap:14px;flex-wrap:wrap}
+  .hypo .h-meta b{color:var(--ink2);font-weight:600}
+  .rules-wrap{overflow-x:auto;margin:18px 0;border:1px solid var(--line);border-radius:14px;background:var(--paper)}
+  table.rules{border-collapse:collapse;width:100%;min-width:540px;font-size:13.5px}
+  .rules th{text-align:left;font-size:12px;font-weight:700;color:var(--ink3);letter-spacing:.04em;padding:12px 16px;border-bottom:1px solid var(--line);white-space:nowrap}
+  .rules td{padding:12px 16px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--ink2);line-height:1.65}
+  .rules tr:last-child td{border-bottom:none}
+  .rules td:first-child{color:var(--ink);font-weight:600}
+  .foot{margin-top:64px;border-top:1px solid var(--line);padding-top:20px;font-size:12.5px;color:var(--ink3);line-height:1.75;max-width:720px;margin-left:auto;margin-right:auto}
+  .foot a{color:var(--blue-ink)}
+</style>
+</head>
+<body>
+
+<div class="demo-bar">
+  <div class="demo-bar-in">
+    <span class="db-label">시안 B 데모</span>
+    <div class="db-chips" role="group" aria-label="데모 화면 바로가기">
+      <button data-jump="create">회의 만들기</button>
+      <button data-jump="propose">시스템 제안</button>
+      <button data-jump="experience">참석자가 받는 것</button>
+      <button data-jump="timeline">진행 타임라인</button>
+      <button data-jump="done">확정</button>
+    </div>
+    <a class="db-note" href="https://claude.ai/code/artifact/5ac702c5-8b43-49e6-8e09-862788b6f147">시안 A 보기 →</a>
+  </div>
+</div>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="eyebrow">Product Design Case Study · 시안 B</div>
+    <h1>묻지 않는 조율 — 입력 없이 여섯 명의 한 시간 잡기</h1>
+    <p>시안 A는 모두의 사정을 모아서 풀었어요. 시안 B는 질문을 뒤집어요 —
+    <b>"애초에 왜 모두에게 입력을 받아야 하지?"</b>
+    아무에게도 시간을 묻지 않고, 시스템이 아는 것(캘린더)과 추론한 것(행동 패턴)으로 바로 제안합니다.
+    참석자가 받는 건 버튼 하나, <b>[어려워요]</b> 뿐이에요. 침묵은 동의이고, 마감이 지나면 자동 확정돼요.</p>
+    <div class="hero-chips">
+      <span class="hchip b">입력 0회 · 거부권 1비트</span>
+      <span class="hchip">역할 · 리서치 → UX → UI → 프로토타입</span>
+      <span class="hchip">환경 · 반응형 웹</span>
+      <span class="hchip">UI 레퍼런스 · 토스 디자인 언어</span>
+    </div>
+  </header>
+
+  <div class="app" id="app">
+    <div class="topbar">
+      <span class="brand"><span class="brand-mark">겹</span>겹 <span class="b-tag">시안 B</span></span>
+      <span class="flow-hint">만들기 → 시스템 제안 → 거부권 → 자동 확정</span>
+      <button class="reset-btn" id="reset">처음부터</button>
+    </div>
+
+    <div class="stage">
+
+      <section class="screen" data-screen="create">
+        <div class="narrow">
+          <h2 class="h-title">새 회의</h2>
+          <p class="h-sub">참석자에게 아무것도 묻지 않아요. 캘린더와 지난 회의 패턴으로 <b>겹이 먼저 제안</b>할게요.</p>
+          <div class="f-sec">
+            <div class="field-label">무슨 회의인가요?</div>
+            <input class="text-field" id="f-title" value="Q3 킥오프 회의" aria-label="회의 이름">
+          </div>
+          <div class="f-sec">
+            <div class="field-label">얼마나 걸리나요?</div>
+            <div class="chip-row" id="dur-chips">
+              <button class="chip" data-v="30">30분</button>
+              <button class="chip" data-v="60" aria-pressed="true">1시간</button>
+              <button class="chip" data-v="90">1시간 30분</button>
+            </div>
+          </div>
+          <div class="f-sec">
+            <div class="field-label">누구와 함께하나요?</div>
+            <div class="p-list" id="att-list"></div>
+          </div>
+          <div class="f-sec" style="margin-bottom:0">
+            <div class="field-label">언제까지 잡을까요?</div>
+            <div class="chip-row">
+              <button class="chip" aria-pressed="true">다음 주 <span class="tn">(7/13–17)</span></button>
+              <button class="chip" disabled>직접 선택</button>
+            </div>
+            <div class="rule-note"><span class="ic">!</span>
+              <span>업무 시간 <b class="tn">9:00–18:00</b>, 점심 <b class="tn">12–13시</b> 제외.
+              6명의 캘린더와 최근 12주의 회의 수락·거절 패턴을 근거로 제안하고, <b>근거는 전부 공개</b>돼요.</span></div>
+          </div>
+          <button class="cta" data-go="propose">묻지 않고 바로 제안 받기</button>
+        </div>
+      </section>
+
+      <section class="screen" data-screen="propose">
+        <div class="midcol">
+          <h2 class="h-title">이 시간으로 보낼게요</h2>
+          <p class="h-sub">아무에게도 묻지 않았어요. 아래 근거로 골랐고, <b>어려운 사람만 버튼 한 번</b> 누르면 돼요.</p>
+
+          <div class="prop-card">
+            <div class="prop-k">1순위 제안</div>
+            <div class="prop-time tn"><span>월 7/13</span>15:00–16:00</div>
+            <div class="prop-why">확실한 일정 충돌 0건 · 주의 신호 0건 · 마감 목 18:00, 무응답은 동의로 처리</div>
+          </div>
+          <div class="backup-row">
+            <div class="backup"><b class="tn">2순위 · 월 7/13 16:00–17:00</b>거부가 오면 자동으로 이 시간을 다시 제안해요</div>
+            <div class="backup"><b class="tn">3순위 · 금 7/17 9:00–10:00</b>소라님의 오전 집중 패턴과 겹쳐 순위를 낮췄어요</div>
+          </div>
+
+          <p class="sig-label">겹이 본 것 — 근거는 숨기지 않아요</p>
+          <div class="signals" id="signals"></div>
+
+          <button class="cta" data-go="send">이대로 6명에게 보내기</button>
+          <button class="cta-sub" data-go="experience">참석자가 받는 화면 미리 보기</button>
+        </div>
+      </section>
+
+      <section class="screen" data-screen="experience">
+        <div class="midcol">
+          <h2 class="h-title">참석자가 받는 건 이게 전부예요</h2>
+          <p class="h-sub">그리드도, 설문도 없어요. 수민님 시점으로 직접 눌러보세요 —
+          수민님의 오후 사정은 <b>캘린더에 없는 모호한 정보</b>지만, 필요한 순간에 한 번의 탭으로 나와요.</p>
+          <div class="msg-wrap">
+            <div class="msg-app">
+              <div class="msg-from"><span class="brand-mark">겹</span>겹 · 지금 · 이수민님에게</div>
+              <div class="msg-card" id="msg-card">
+                <div class="msg-title">Q3 킥오프 회의 · 1시간</div>
+                <div class="msg-time tn"><span>월 7/13</span>15:00–16:00</div>
+                <div class="msg-note">지영님이 만든 회의예요. <b>목 18:00까지</b> 어렵다는 답이 없으면 이대로 확정돼요.
+                괜찮다면 아무것도 안 하셔도 돼요.</div>
+                <div class="msg-btns">
+                  <button class="msg-ok" id="msg-ok">괜찮아요</button>
+                  <button class="msg-no" id="msg-no">어려워요</button>
+                </div>
+                <div class="reason-box" id="reason-box" hidden>
+                  <div class="field-label">이유를 남길까요? (선택사항이에요)</div>
+                  <div class="reason-chips" id="reason-chips">
+                    <button class="rchip">다른 일정이 생길 것 같아요</button>
+                    <button class="rchip">그 시간대가 부담돼요</button>
+                    <button class="rchip">이동이 필요해요</button>
+                  </div>
+                  <button class="msg-send" id="msg-send">보내기</button>
+                </div>
+              </div>
+            </div>
+            <p class="exp-note">응답을 보내면 겹이 2순위로 자동 재제안하고, 이 신호를 다음 조율에 기억해요.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" data-screen="timeline">
+        <div class="midcol">
+          <h2 class="h-title">보낸 뒤엔 겹이 알아서 진행해요</h2>
+          <p class="h-sub">주최자는 기다리지 않아요. 거부가 오면 즉시 재제안하고, 마감이 되면 자동 확정돼요.</p>
+          <span class="deadline-chip"><i></i>마감 목 18:00 · 무응답은 동의로 처리돼요</span>
+          <div class="tl" id="tl"></div>
+          <button class="skip-btn" id="skip" hidden>마감 시점으로 건너뛰기 (데모)</button>
+        </div>
+      </section>
+
+      <section class="screen" data-screen="done">
+        <div class="done-body">
+          <div class="done-check"><svg viewBox="0 0 24 24"><path d="M4.5 12.5 L10 18 L19.5 7"/></svg></div>
+          <div class="done-title">묻지 않고 확정됐어요</div>
+          <div class="done-time tn">7월 13일 월요일 · 16:00–17:00</div>
+          <p class="done-sub">누구도 시간표를 입력하지 않았어요. 6명 중 <b>1명만</b> 버튼 한 번을 눌렀고,
+          나머지는 아무것도 하지 않았어요.</p>
+          <div class="done-card" id="done-card">
+            <b>이수민</b> · 어려워요 1회 → 2순위로 자동 재제안<br>
+            <b>최다은 · 정우성 · 박준호</b> · 괜찮아요<br>
+            <b>김지영 · 한소라</b> · 무응답 → 마감 규칙에 따라 동의 처리<br>
+            <span style="font-size:12px;color:var(--ink3)">6명 모두에게 캘린더 초대와 확정 요약을 보냈어요. (데모)</span>
+          </div>
+          <div class="learn-card">겹이 기억할게요 — 수민님의 월요일 늦은 오후는 고객 콜이 늘어지는 편이에요.
+          다음 조율에서는 이 시간의 순위를 낮출게요. (틀렸다면 언제든 무시하세요)</div>
+          <button class="cta" data-go="reset" style="max-width:320px">처음으로</button>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <div class="case-divider" id="case"><span>설계 노트 · 시안 B</span></div>
+  <div class="case">
+
+    <section class="sec">
+      <div class="sec-no">00 · 왜 두 번째 시안인가</div>
+      <h2>입력은 비용이다 — 그것도 6명분의</h2>
+      <p>시안 A는 “정보 손실”을 3단계 응답으로 풀었어요. 정확하지만, 정직하게 보면 <b>6명 모두에게 숙제를 내는 설계</b>예요.
+      응답이 늦은 한 명이 전체를 지연시키고(직렬 병목), “모호한 시간”을 스스로 형식화해 입력하라는 요구 자체가 부담이에요.
+      그래서 B는 문제를 다시 뒤집었어요 — <b>“모두에게 미리 묻지 않고도 풀 수 있는가?”</b></p>
+      <div class="callout">
+        필요한 정보를 분해하면: ① 확실한 불가(캘린더에 이미 있음) ② 모호한 사정(본인도 미리 형식화하기 어려움)
+        ③ 선호(물어보면 눈치가 섞임). <b>①은 이미 있고, ③은 행동에서 추론되고, ②는 “걸리는 순간”에만 존재해요.</b>
+        그렇다면 미리 물을 이유가 없어요. 제안하고, 걸린 사람의 거부권 1비트만 받으면 돼요.
+      </div>
+    </section>
+
+    <section class="sec">
+      <div class="sec-no">01 · 구조</div>
+      <h2>수집 → 계산 → 선택이 아니라, 제안 → 거부권 → 자동 확정</h2>
+      <div class="principles">
+        <div class="principle"><span class="no">1</span><div><b>묻지 말고 제안한다</b>
+          <span>캘린더(확실한 일정) + 최근 12주 회의 수락·거절 패턴(추론)으로 1·2·3순위를 만들고, 1순위를 바로 보낸다. 입력 대기 시간이 0이 된다.</span></div></div>
+        <div class="principle"><span class="no">2</span><div><b>침묵은 동의다 — 단, 마감과 함께</b>
+          <span>“목 18:00까지 어렵다는 답이 없으면 확정”을 처음부터 고지한다. 응답하지 않는 것이 가장 쉬운 참여가 된다.</span></div></div>
+        <div class="principle"><span class="no">3</span><div><b>모호함은 필요한 순간, 필요한 사람에게서 1비트만</b>
+          <span>“오후 콜이 늘어질 것 같다” 같은 모호한 사정은 미리 형식화할 수 없다. 걸리는 제안이 왔을 때 [어려워요] 한 번이면 충분하고, 이유는 선택사항이다.</span></div></div>
+        <div class="principle"><span class="no">4</span><div><b>추론은 근거와 신뢰도를 밝힌다</b>
+          <span>“준호님은 13시 회의를 피하는 편(최근 8주 4건 중 3건 거절 · 신뢰도 높음)”처럼 시스템이 본 것을 그대로 보여준다. 블랙박스가 아니라 반박 가능한 주장으로.</span></div></div>
+      </div>
+    </section>
+
+    <section class="sec">
+      <div class="sec-no">02 · 가설</div>
+      <h2>무엇이 좋아진다고 믿는가</h2>
+      <div class="hypos">
+        <div class="hypo"><span class="h-tag">B-H1 · 속도</span>
+          <p>입력 수집을 없애면 <b>요청 → 확정 시간이 2.3일에서 마감 단위(수 시간)로 줄어든다.</b> 병목이 “가장 느린 응답자”에서 “마감 시각”으로 바뀌기 때문.</p>
+          <div class="h-meta"><span>지표 → <b>요청→확정 시간 · 마감 전 확정률</b></span></div>
+        </div>
+        <div class="hypo"><span class="h-tag">B-H2 · 참여 부담</span>
+          <p>N명 전원의 그리드 입력을 1명 이하의 버튼 탭으로 줄이면 <b>조율 자체를 미루는 행동이 사라진다.</b> 하지 않아도 되는 것이 가장 높은 응답률이다.</p>
+          <div class="h-meta"><span>지표 → <b>참석자당 소요 액션 수 · 거부율</b></span></div>
+        </div>
+        <div class="hypo"><span class="h-tag">B-H3 · 학습</span>
+          <p>거부 1비트와 그 맥락을 축적하면 <b>재제안 횟수가 회차마다 줄어든다.</b> 모호한 사정이 반복되면 그것은 더 이상 모호하지 않다.</p>
+          <div class="h-meta"><span>지표 → <b>회의당 재제안 횟수 추이 · 추론 적중률</b></span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec">
+      <div class="sec-no">03 · 리스크와 방어</div>
+      <h2>이 설계가 무너지는 지점들</h2>
+      <div class="rules-wrap"><table class="rules">
+        <thead><tr><th>리스크</th><th>방어 설계</th></tr></thead>
+        <tbody>
+          <tr><td>추론이 틀린다</td><td>추론은 순위에만 영향을 주고 시간을 막지 않는다. 근거·신뢰도를 공개하고, 틀리면 거부권이 잡는다. 확정 화면의 학습 카드에도 “틀렸다면 무시하세요”를 명시.</td></tr>
+          <tr><td>침묵=동의의 사회적 부담</td><td>마감을 처음부터 고지하고, 거부를 원탭으로 가장 싸게 만든다. 마감 3시간 전 미응답자에게 한 번만 리마인드.</td></tr>
+          <tr><td>거부 연쇄로 수렴 실패</td><td>재제안은 3회까지, 이후엔 시안 A의 수집 모드로 자동 전환(폴백). 두 시안은 대립이 아니라 계층이다.</td></tr>
+          <tr><td>콜드 스타트(패턴 데이터 없음)</td><td>첫 몇 회는 캘린더만으로 제안하거나 A 방식으로 시작하고, 회차가 쌓이면 B로 전환을 제안한다.</td></tr>
+          <tr><td>프라이버시 — 행동 추론의 불쾌함</td><td>추론은 본인에게 먼저 보여주고 끌 수 있게 한다. “겹이 나를 이렇게 이해하고 있어요” 설정 화면으로 통제권을 사용자에게.</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section class="sec">
+      <div class="sec-no">04 · 시안 A와의 관계</div>
+      <h2>대립이 아니라 계층이다</h2>
+      <div class="rules-wrap"><table class="rules">
+        <thead><tr><th></th><th>시안 A · 모아서 푼다</th><th>시안 B · 묻지 않고 푼다</th></tr></thead>
+        <tbody>
+          <tr><td>참석자 비용</td><td>전원 그리드 응답(캘린더 연동 시 보정만)</td><td>0 ~ 버튼 1탭</td></tr>
+          <tr><td>속도</td><td>가장 느린 응답자에 종속</td><td>마감 시각에 종속</td></tr>
+          <tr><td>정보 정확도</td><td>높음 — 본인이 직접 표현</td><td>추론 의존 — 거부권으로 보정</td></tr>
+          <tr><td>맞는 상황</td><td>중요한 회의, 첫 조율, 외부인 포함</td><td>반복되는 팀 회의, 데이터가 쌓인 팀</td></tr>
+          <tr><td>실패 시</td><td>—</td><td>재제안 3회 후 A로 폴백</td></tr>
+        </tbody>
+      </table></div>
+      <div class="callout">그래서 최종 제안은 “A vs B”가 아니라 <b>기본은 B, 필요할 때 A</b>예요.
+      일상의 조율은 묻지 않고 흐르게 하고, 중요한 조율만 모두의 목소리를 모은다 —
+      이렇게 두 시안이 하나의 제품이 됩니다.</div>
+    </section>
+
+    <footer class="foot">
+      UI는 토스의 디자인 언어를 참고해 웹 환경에 맞게 재구성했고, 색·타이포·라운드 토큰은 자체 정의했어요.
+      의존성 없는 단일 HTML, 라이트/다크 테마, 키보드 접근, <span class="tn">prefers-reduced-motion</span> 지원.
+      행동 패턴 수치는 과제용 가상 설정입니다. ·
+      <a href="https://claude.ai/code/artifact/5ac702c5-8b43-49e6-8e09-862788b6f147">시안 A — 모아서 푸는 겹 보기</a>
+    </footer>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  function $(s){ return document.querySelector(s); }
+  function el(tag, cls, html){ var n=document.createElement(tag); if(cls)n.className=cls; if(html!==undefined)n.innerHTML=html; return n; }
+  function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+  var REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  var AVATAR = ["#3182F6","#00A86B","#8B5CF6","#E8618C","#0FA5A8","#C98007"];
+  var PEOPLE = [
+    {id:"jy", name:"김지영", job:"프로덕트 디자이너", me:true, role:"required"},
+    {id:"jh", name:"박준호", job:"백엔드 엔지니어", role:"required"},
+    {id:"sm", name:"이수민", job:"필드 세일즈", role:"required"},
+    {id:"de", name:"최다은", job:"프로덕트 매니저", role:"required"},
+    {id:"ws", name:"정우성", job:"데이터 분석가", role:"optional"},
+    {id:"sr", name:"한소라", job:"콘텐츠 마케터", role:"optional"}
+  ];
+  function color(i){ return AVATAR[i%AVATAR.length]; }
+  function pIdx(id){ return PEOPLE.findIndex(function(p){return p.id===id;}); }
+
+  var SIGNALS = [
+    {p:"sm", kind:"cal", t:"수민님은 화·목 종일 외근이에요", m:"반복 일정 ‘고객사 방문’ · 화·목 컬럼은 후보에서 제외했어요"},
+    {p:"jy", kind:"cal", t:"지영님·다은님·우성님·준호님의 확정 일정 7건을 피했어요", m:"스프린트 회의, 임원 보고, 컨퍼런스, 배포 점검 등 — 캘린더에서 그대로 가져왔어요"},
+    {p:"jh", kind:"infer", conf:"hi", t:"준호님은 13시 회의를 피하는 편이에요", m:"최근 8주 · 13시 시작 회의 4건 중 3건 거절 또는 이동 요청 · 13–14시 순위를 낮췄어요"},
+    {p:"sr", kind:"infer", conf:"md", t:"소라님은 오전 10–12시에 잘 응하지 않아요", m:"최근 12주 · 해당 시간대 수락률 34% · 집중 업무 시간으로 추정돼요"},
+    {p:"de", kind:"infer", conf:"md", t:"다은님은 금요일 16시 이후 이동이 잦아요", m:"최근 12주 · 금 16시 이후 회의 5건 중 3건 시간 변경 · 금 늦은 오후 순위를 낮췄어요"}
+  ];
+
+  var TL_EVENTS = [
+    {dot:"sys", t:"6명에게 제안을 보냈어요", m:"월 7/13 15:00–16:00 · 마감 목 18:00", when:"화 10:12"},
+    {dot:"ok", p:"de", t:"최다은님 · 괜찮아요", m:"버튼 한 번, 3초 걸렸어요", when:"화 10:19"},
+    {dot:"ok", p:"ws", t:"정우성님 · 괜찮아요", m:"", when:"화 10:34"},
+    {dot:"no", p:"sm", t:"이수민님 · 어려워요", m:"", when:"화 11:02",
+     card:"“다른 일정이 생길 것 같아요” — 캘린더에는 없던 사정이에요. <b>미리 물었다면 수민님도 몰랐을 정보</b>가, 걸리는 순간에 1비트로 나왔어요."},
+    {dot:"sys", t:"2순위로 자동 재제안했어요", m:"월 7/13 16:00–17:00 · 이미 ‘괜찮아요’한 2명에게는 변경만 알렸어요", when:"화 11:02"},
+    {dot:"ok", p:"jh", t:"박준호님 · 괜찮아요", m:"", when:"화 13:40"},
+    {dot:"wait", t:"지영님·소라님은 아직 응답이 없어요", m:"무응답은 마감 시점에 동의로 처리돼요 · 마감 3시간 전에 한 번만 리마인드할게요", when:"수 09:00"}
+  ];
+
+  var current = "create", tlTimers = [], tlStarted = false, booted = false;
+
+  function show(name){
+    current = name;
+    document.querySelectorAll(".screen").forEach(function(sc){
+      sc.classList.toggle("active", sc.dataset.screen===name);
+    });
+    if(name==="create") renderAttendees();
+    if(name==="propose") renderSignals();
+    if(name==="experience") resetMsg();
+    if(name==="timeline") startTimeline();
+    if(booted){
+      var top = $("#app").getBoundingClientRect().top + window.scrollY - 64;
+      if(Math.abs(window.scrollY - top) > 240) window.scrollTo({top:Math.max(0,top), behavior: REDUCED ? "auto" : "smooth"});
+    }
+  }
+
+  document.querySelectorAll("[data-go]").forEach(function(b){
+    b.addEventListener("click", function(){
+      var g = b.dataset.go;
+      if(g==="send"){ toast("6명에게 제안을 보냈어요 — 이제 기다리지 않아도 돼요"); show("timeline"); return; }
+      if(g==="reset"){ resetAll(); return; }
+      show(g);
+    });
+  });
+  document.querySelectorAll("[data-jump]").forEach(function(b){
+    b.addEventListener("click", function(){ show(b.dataset.jump); });
+  });
+  document.querySelectorAll("#dur-chips .chip").forEach(function(c){
+    c.addEventListener("click", function(){
+      document.querySelectorAll("#dur-chips .chip").forEach(function(x){ x.setAttribute("aria-pressed", String(x===c)); });
+      if(c.dataset.v!=="60") toast("데모에서는 1시간 기준으로 계산해요");
+    });
+  });
+
+  function renderAttendees(){
+    var box = $("#att-list"); box.innerHTML = "";
+    PEOPLE.forEach(function(p, i){
+      var row = el("div","p-row");
+      var a = el("span","avatar", esc(p.name.slice(1,2))); a.style.background = color(i);
+      row.appendChild(a);
+      var info = el("div","p-info");
+      info.appendChild(el("div","p-nm", esc(p.name)+(p.me?' <span class="p-me">나</span>':"")));
+      info.appendChild(el("div","p-jb", esc(p.job)));
+      row.appendChild(info);
+      var seg = el("div","seg"+(p.me?" locked":""));
+      ["required","optional"].forEach(function(r){
+        var b = el("button","", r==="required"?"필수":"선택");
+        b.setAttribute("aria-pressed", String(p.role===r));
+        if(p.me) b.disabled = true;
+        else b.addEventListener("click", function(){ p.role = r; renderAttendees(); });
+        seg.appendChild(b);
+      });
+      row.appendChild(seg);
+      box.appendChild(row);
+    });
+  }
+
+  function renderSignals(){
+    var box = $("#signals"); box.innerHTML = "";
+    SIGNALS.forEach(function(s){
+      var i = pIdx(s.p);
+      var card = el("div","sig");
+      var a = el("span","avatar sm", esc(PEOPLE[i].name.slice(1,2))); a.style.background = color(i);
+      card.appendChild(a);
+      var body = el("div","sig-body");
+      var conf = s.conf ? ' <span class="conf '+s.conf+'">신뢰도 '+(s.conf==="hi"?"높음":s.conf==="md"?"중간":"낮음")+"</span>" : "";
+      body.appendChild(el("div","sig-t", esc(s.t)+conf));
+      body.appendChild(el("div","sig-m", esc(s.m)));
+      card.appendChild(body);
+      card.appendChild(el("span","sig-tag "+s.kind, s.kind==="cal"?"캘린더":"추론"));
+      box.appendChild(card);
+    });
+  }
+
+  /* experience */
+  function resetMsg(){
+    $("#reason-box").hidden = true;
+    $("#msg-no").disabled = false; $("#msg-ok").disabled = false;
+    document.querySelectorAll("#reason-chips .rchip").forEach(function(c){ c.setAttribute("aria-pressed","false"); });
+  }
+  $("#msg-ok").addEventListener("click", function(){
+    toast("괜찮아요로 응답했어요 — 이게 전부예요");
+    setTimeout(function(){ show("timeline"); }, REDUCED ? 0 : 500);
+  });
+  $("#msg-no").addEventListener("click", function(){
+    $("#reason-box").hidden = false;
+  });
+  document.querySelectorAll("#reason-chips .rchip").forEach(function(c){
+    c.addEventListener("click", function(){
+      document.querySelectorAll("#reason-chips .rchip").forEach(function(x){
+        x.setAttribute("aria-pressed", String(x===c && x.getAttribute("aria-pressed")!=="true"));
+      });
+    });
+  });
+  $("#msg-send").addEventListener("click", function(){
+    toast("수민님의 응답이 전달됐어요 — 겹이 2순위로 재제안해요");
+    setTimeout(function(){ show("timeline"); }, REDUCED ? 0 : 500);
+  });
+
+  /* timeline */
+  function tlItem(ev){
+    var it = el("div","tl-item");
+    var dotTxt = ev.dot==="sys" ? "겹" : ev.dot==="wait" ? "…" : (ev.p ? PEOPLE[pIdx(ev.p)].name.slice(1,2) : "");
+    var dot = el("span","tl-dot "+(ev.dot==="wait"?"":ev.dot), esc(dotTxt));
+    if(ev.p && ev.dot!=="sys"){ dot.style.background = ev.dot==="ok" ? "var(--green-bg)" : "var(--orange-bg)"; }
+    it.appendChild(dot);
+    var body = el("div","tl-body");
+    body.appendChild(el("div","tl-t", esc(ev.t)));
+    if(ev.m) body.appendChild(el("div","tl-m", esc(ev.m)));
+    if(ev.card) body.appendChild(el("div","tl-cardline", ev.card));
+    body.appendChild(el("div","tl-when tn", esc(ev.when)));
+    it.appendChild(body);
+    return it;
+  }
+  function startTimeline(){
+    if(tlStarted) return;
+    tlStarted = true;
+    var box = $("#tl");
+    if(REDUCED){
+      TL_EVENTS.forEach(function(ev){ box.appendChild(tlItem(ev)); });
+      $("#skip").hidden = false;
+      return;
+    }
+    TL_EVENTS.forEach(function(ev, i){
+      tlTimers.push(setTimeout(function(){
+        box.appendChild(tlItem(ev));
+        if(i===TL_EVENTS.length-1) $("#skip").hidden = false;
+      }, 650*i));
+    });
+  }
+  $("#skip").addEventListener("click", function(){
+    var box = $("#tl");
+    box.appendChild(tlItem({dot:"sys", t:"목 18:00 — 마감이 지났어요", m:"월 7/13 16:00–17:00으로 자동 확정 · 6명에게 초대를 보냈어요", when:"목 18:00"}));
+    $("#skip").hidden = true;
+    setTimeout(function(){ show("done"); }, REDUCED ? 0 : 900);
+  });
+
+  function resetAll(){
+    PEOPLE.forEach(function(p){ p.role = (p.id==="ws"||p.id==="sr")?"optional":"required"; });
+    tlTimers.forEach(clearTimeout); tlTimers = [];
+    tlStarted = false;
+    $("#tl").innerHTML = ""; $("#skip").hidden = true;
+    $("#f-title").value = "Q3 킥오프 회의";
+    resetMsg();
+    show("create");
+  }
+  $("#reset").addEventListener("click", resetAll);
+
+  var toastTimer = null;
+  function toast(msg){
+    var old = document.querySelector(".apptoast"); if(old) old.remove();
+    var t = el("div","apptoast", esc(msg));
+    document.body.appendChild(t);
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ t.remove(); }, 2600);
+  }
+
+  show("create");
+  booted = true;
+})();
+</script>
+</body>
+</html>
