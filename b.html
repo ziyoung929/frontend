@@ -366,6 +366,10 @@
   .rules td{padding:12px 16px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--ink2);line-height:1.65}
   .rules tr:last-child td{border-bottom:none}
   .rules td:first-child{color:var(--ink);font-weight:600}
+  .rules.map{min-width:640px}
+  .rules.map td:first-child{white-space:normal;font-weight:500;color:var(--ink2)}
+  .rules.map td:nth-child(2){white-space:nowrap;color:var(--ink);font-weight:700}
+  .rules.map td:last-child{white-space:nowrap;color:var(--blue-ink);font-weight:700}
   .foot{margin-top:64px;border-top:1px solid var(--line);padding-top:20px;font-size:12.5px;color:var(--ink3);line-height:1.75;max-width:720px;margin-left:auto;margin-right:auto}
   .foot a{color:var(--blue-ink)}
 </style>
@@ -390,10 +394,11 @@
 <div class="wrap">
   <header class="hero">
     <div class="eyebrow">Product Design Case Study · 시안 B</div>
-    <h1>묻지 않고 잡아드릴게요 — 아무도 시간을 입력하지 않는 시안 B</h1>
-    <p>시안 A는 모두에게 "언제 되세요?"를 물었어요. 시안 B는 묻는 것 자체를 없앴어요.
-    겹이 캘린더와 지난 회의 기록을 보고 <b>먼저 시간을 골라서 보내요.</b>
-    받은 사람은 어려울 때만 <b>[어려워요]</b> 버튼을 한 번 누르면 돼요. 답이 없으면 그대로 확정돼요.</p>
+    <h1>묻는 단계를 없애면,<br>회의는 몇 시간 만에 잡힌다</h1>
+    <p>조율이 느린 이유는 6명의 입력을 기다려서예요 — 가장 늦게 답하는 사람이 속도를 정해요(평균 2.3일).
+    시안 B는 <b>입력 수집을 캘린더와 행동 기록으로 대체</b>해서 겹이 먼저 시간을 보내고,
+    참석자에겐 <b>[어려워요] 버튼 하나</b>만 남겨요. 마감까지 말이 없으면 그대로 확정 —
+    속도가 사람이 아니라 <b>마감에 묶여요.</b></p>
     <div class="hero-chips">
       <span class="hchip b">아무도 입력하지 않아요 · 버튼 하나면 돼요</span>
       <span class="hchip">역할 · 리서치 → UX → UI → 프로토타입</span>
@@ -552,7 +557,33 @@
   <div class="case">
 
     <section class="sec">
-      <div class="sec-no">00 · 왜 두 번째 시안인가</div>
+      <div class="sec-no">00 · 한눈 요약</div>
+      <h2>무엇으로, 무엇을, 어떻게 해결하나</h2>
+      <div class="rules-wrap"><table class="rules map">
+        <thead><tr><th>이 문제를</th><th>이 장치로</th><th>이렇게 풀어요</th><th>확인할 숫자</th></tr></thead>
+        <tbody>
+          <tr><td>확정까지 2.3일 — 가장 늦게 답하는 사람이 속도를 정함</td>
+              <td><b>먼저 제안 + 마감 자동 확정</b></td>
+              <td>기다리지 않고 보내고, 마감이 지나면 확정 — 속도가 마감에 묶임</td>
+              <td>확정까지 2.3일 → 수 시간</td></tr>
+          <tr><td>6명 모두에게 ‘시간표 채우기’ 숙제를 냄</td>
+              <td><b>[어려워요] 버튼 하나</b></td>
+              <td>괜찮으면 아무것도 안 해도 됨 — 인당 할 일이 0~1회로</td>
+              <td>인당 액션 수 0~1회</td></tr>
+          <tr><td>“콜이 늘어질 것 같아요” 같은 사정은 미리 적을 수 없음</td>
+              <td><b>거절 순간의 원탭 수집</b></td>
+              <td>걸리는 제안이 왔을 때, 걸린 사람에게서만 받음</td>
+              <td>재제안 횟수↓</td></tr>
+          <tr><td>선호를 물으면 눈치가 섞임(‘가능’ 거짓 응답 71%)</td>
+              <td><b>행동 기록 + 맞아요/아니에요</b></td>
+              <td>묻지 않고 짐작하고, 본인은 확인만 — 입력 없이 정확해짐</td>
+              <td>짐작 적중률·거부율↓</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section class="sec">
+      <div class="sec-no">01 · 왜 두 번째 시안인가</div>
       <h2>입력은 숙제다 — 그것도 6명분의</h2>
       <p>시안 A는 “정보 손실”을 3단계 응답으로 풀었어요. 정확하지만, 정직하게 보면 <b>6명 모두에게 숙제를 내는 설계</b>예요.
       가장 늦게 답하는 한 명이 모두를 기다리게 하고, ‘애매한 시간’을 스스로 정리해서 적으라는 것 자체가 부담이에요.
@@ -565,7 +596,7 @@
     </section>
 
     <section class="sec">
-      <div class="sec-no">01 · 구조</div>
+      <div class="sec-no">02 · 구조</div>
       <h2>수집 → 계산 → 선택이 아니라, 제안 → 거부권 → 자동 확정</h2>
       <div class="principles">
         <div class="principle"><span class="no">1</span><div><b>묻지 말고 제안한다</b>
@@ -580,7 +611,7 @@
     </section>
 
     <section class="sec">
-      <div class="sec-no">02 · 선호 감지</div>
+      <div class="sec-no">03 · 선호 감지</div>
       <h2>피하고 싶은 시간은 이미 행동에 남아 있다</h2>
       <p>“피하고 싶은 시간”을 물어보면 눈치를 보느라 솔직하기 어렵고(‘가능’으로 거짓 응답 71%), 입력하라고 하면 미루게 됩니다.
       그런데 이 정보는 이미 행동에 남아 있어요 — <b>거절·이동 이력의 시간대 분포, 본인이 주최한 회의의 시간대
@@ -601,7 +632,7 @@
     </section>
 
     <section class="sec">
-      <div class="sec-no">03 · 가설</div>
+      <div class="sec-no">04 · 가설</div>
       <h2>무엇이 좋아진다고 믿는가</h2>
       <div class="hypos">
         <div class="hypo"><span class="h-tag">B-H1 · 속도</span>
@@ -624,7 +655,7 @@
     </section>
 
     <section class="sec">
-      <div class="sec-no">04 · 리스크와 방어</div>
+      <div class="sec-no">05 · 리스크와 방어</div>
       <h2>이 설계가 무너지는 지점들</h2>
       <div class="rules-wrap"><table class="rules">
         <thead><tr><th>리스크</th><th>방어 설계</th></tr></thead>
@@ -639,7 +670,7 @@
     </section>
 
     <section class="sec">
-      <div class="sec-no">05 · 시안 A와의 관계</div>
+      <div class="sec-no">06 · 시안 A와의 관계</div>
       <h2>대립이 아니라 계층이다</h2>
       <div class="rules-wrap"><table class="rules">
         <thead><tr><th></th><th>시안 A · 모아서 푼다</th><th>시안 B · 묻지 않고 푼다</th></tr></thead>

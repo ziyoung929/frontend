@@ -413,6 +413,10 @@
   .rules td{padding:12px 16px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--ink2);line-height:1.65}
   .rules tr:last-child td{border-bottom:none}
   .rules td:first-child{color:var(--ink);font-weight:600;white-space:nowrap}
+  .rules.map{min-width:640px}
+  .rules.map td:first-child{white-space:normal;font-weight:500;color:var(--ink2)}
+  .rules.map td:nth-child(2){white-space:nowrap;color:var(--ink)}
+  .rules.map td:last-child{white-space:nowrap;color:var(--blue-ink);font-weight:700}
   .metrics{margin:18px 0;display:flex;flex-direction:column;gap:9px}
   .metric{display:flex;gap:10px;align-items:baseline;font-size:14px;color:var(--ink2);line-height:1.65}
   .metric::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--blue);flex:none;transform:translateY(-2px)}
@@ -440,10 +444,11 @@
 <div class="wrap">
   <header class="hero">
     <div class="eyebrow">Product Design Case Study · Web</div>
-    <h1>여섯 명의 한 시간 — “언제 돼요?”가 놓치는 것들</h1>
-    <p>같은 회사 동료 6명이 다음 주까지 1시간 회의를 잡아야 해요. 누군가는 점심 직후를 피하고 싶고,
-    누군가는 특정 요일에 외근이고, 꼭 와야 하는 사람과 선택인 사람이 섞여 있어요.
-    아래에서 만들기부터 확정까지 직접 눌러보세요.</p>
+    <h1>‘피하고 싶어요’를 말할 수 있게 하면,<br>회의는 한 번에 잡힌다</h1>
+    <p>회의가 다시 잡히는 진짜 이유는 시간이 없어서가 아니라, 눈치 때문에 ‘가능’이라고 답한
+    시간에 잡혀서예요 — 그래서 38%가 확정 후에 다시 잡아요. 시안 A는 <b>응답 선택지에 ‘피하고
+    싶어요’를 추가하는 것</b>으로 이 문제를 풀어요. 이 답은 시간을 막지 않고 추천 순서만 내리기 때문에,
+    말해도 손해가 없고 → 그래서 솔직해져요. 아래에서 직접 눌러보세요.</p>
     <div class="hero-chips">
       <span class="hchip">역할 · 리서치 → UX → UI → 프로토타입</span>
       <span class="hchip">환경 · 반응형 웹 (PC · 모바일)</span>
@@ -587,6 +592,32 @@
 
   <div class="case-divider" id="case"><span>설계 노트</span></div>
   <div class="case">
+
+    <section class="sec">
+      <div class="sec-no">00 · 한눈 요약</div>
+      <h2>무엇으로, 무엇을, 어떻게 해결하나</h2>
+      <div class="rules-wrap"><table class="rules map">
+        <thead><tr><th>이 문제를</th><th>이 장치로</th><th>이렇게 풀어요</th><th>확인할 숫자</th></tr></thead>
+        <tbody>
+          <tr><td>피하고 싶은 시간을 ‘가능’으로 답함(71%) → 확정 후 다시 잡음(38%)</td>
+              <td><b>‘피하고 싶어요’ 응답</b></td>
+              <td>이 답은 시간을 막지 않고 순위만 내림 → 말해도 손해가 없어서 솔직해짐</td>
+              <td>재조율률 38%↓</td></tr>
+          <tr><td>안 와도 되는 1명의 일정이 전체를 막음 → “되는 시간이 없어요”</td>
+              <td><b>필수/선택 구분</b></td>
+              <td>필수의 ‘안 돼요’만 시간을 차단, 선택은 순위에만 반영</td>
+              <td>후보 0건 발생률↓</td></tr>
+          <tr><td>추천을 못 믿어서 결국 손으로 재확인(확정까지 2.3일)</td>
+              <td><b>이유가 달린 추천</b></td>
+              <td>“꼭 올 4명 가능 · 준호님은 피하고 싶은 시간” — 근거가 보이면 검증이 필요 없음</td>
+              <td>요청→확정 시간↓</td></tr>
+          <tr><td>6명이 시간표를 채워줄 때까지 기다림</td>
+              <td><b>캘린더 미리 채움</b></td>
+              <td>입력이 ‘작성’에서 ‘확인’으로 줄어듦</td>
+              <td>24시간 내 응답률↑</td></tr>
+        </tbody>
+      </table></div>
+    </section>
 
     <section class="sec">
       <div class="sec-no">01 · 문제 정의</div>
