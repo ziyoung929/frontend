@@ -5,55 +5,75 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>겹 — 모두가 괜찮은 시간을 찾는 웹 서비스</title>
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=Geist:wght@400;500;600&display=swap');
+  /* ── Dimension design system ─────────────
+     dusk-lit workspace · frosted glass · pill controls · achromatic + single violet accent
+     Semantic tokens are remapped to Dimension values; the two chromatic status hues
+     (busy/avoid) are kept muted+functional, and the violet accent lives only in
+     gradient washes, the radial success glow, the brand mark and the density heatmap. */
   :root{
-    --page:#F9FAFB; --paper:#FFFFFF;
-    --ink:#191F28; --ink2:#4E5968; --ink3:#8B95A1; --ink4:#B0B8C1;
-    --line:#E5E8EB; --fill:#F2F4F6; --fill2:#F9FAFB;
-    --blue:#3182F6; --blue-dn:#1B64DA; --blue-bg:#E8F3FF; --blue-ink:#1B64DA;
-    --red:#F04452; --red-bg:#FDEBEC;
-    --orange:#E8730A; --orange-bg:#FFF3E0;
-    --heat-lo:#EDF2F7; --heat-hi:#3182F6;
-    --dim:rgba(0,23,51,.45);
-    --shadow:0 16px 40px rgba(0,27,55,.12);
-    --shadow-lg:0 24px 64px rgba(0,27,55,.2);
+    /* theme-independent — faces, accents, gradients, radii */
+    --font-body:'DM Sans','Pretendard Variable',Pretendard,'Apple SD Gothic Neo','Noto Sans KR','Malgun Gothic',system-ui,sans-serif;
+    --font-geist:'Geist','Pretendard Variable',Pretendard,'Apple SD Gothic Neo','Noto Sans KR','Malgun Gothic',system-ui,sans-serif;
+    --violet:#6b62f2;
+    --grad-hero:linear-gradient(105deg,#f5a623 0%,#e8663a 32%,#8a4fd0 66%,#3b6fe0 100%);
+    --grad-violet:linear-gradient(90deg,rgba(107,98,242,0),rgba(107,98,242,0) 40%,rgba(107,98,242,.565) 50%,rgba(107,98,242,0) 60%,rgba(107,98,242,0));
+    --grad-radial:radial-gradient(circle at 50% 38%, #9a92f9, #6b62f2 58%, #4a41c4);
+    --r-pill:9999px; --r-ui:10px; --r-card:24px;
+
+    /* light theme */
+    --page:#f4f4f5; --paper:#ffffff;
+    --ink:#161616; --ink2:#525252; --ink3:#8a8a8a; --ink4:#b3b3b3;
+    --line:#e5e5e5; --fill:#f1f1f2; --fill2:#fafafa;
+    --accent:#161616; --accent-on:#ffffff;
+    --blue:#161616; --blue-dn:#000000; --blue-bg:#f0f0f2; --blue-ink:#161616;
+    --red:#d1444f; --red-bg:#fbeaec;
+    --orange:#a86a17; --orange-bg:#f5efe3;
+    --heat-lo:#ededee; --heat-hi:#6b62f2;
+    --dim:rgba(10,10,12,.42);
+    --shadow:0 8px 30px rgba(20,20,30,.08);
+    --shadow-lg:0 24px 60px rgba(20,20,30,.16);
   }
   @media (prefers-color-scheme: dark){
     :root{
-      --page:#101013; --paper:#17171C;
-      --ink:#E5E8EB; --ink2:#9EA4AA; --ink3:#6B7684; --ink4:#4E5968;
-      --line:#2C2C35; --fill:#26262C; --fill2:#1E1E24;
-      --blue:#4593FC; --blue-dn:#6FA9F7; --blue-bg:#16304F; --blue-ink:#7CB2FC;
-      --red:#F26B76; --red-bg:#3D1F24;
-      --orange:#F0A146; --orange-bg:#3A2B12;
-      --heat-lo:#1E242C; --heat-hi:#3B87F0;
-      --dim:rgba(0,0,0,.6);
-      --shadow:0 16px 40px rgba(0,0,0,.45);
-      --shadow-lg:0 24px 64px rgba(0,0,0,.6);
+      --page:#0a0a0a; --paper:#161616;
+      --ink:#ededed; --ink2:#c2c2c2; --ink3:#8f8f8f; --ink4:#6b6b6b;
+      --line:rgba(255,255,255,.12); --fill:rgba(212,212,212,.10); --fill2:rgba(212,212,212,.05);
+      --accent:#ffffff; --accent-on:#161616;
+      --blue:#ffffff; --blue-dn:#d4d4d4; --blue-bg:rgba(255,255,255,.09); --blue-ink:#ededed;
+      --red:#f0868f; --red-bg:rgba(240,134,143,.14);
+      --orange:#e0a35c; --orange-bg:rgba(224,163,92,.14);
+      --heat-lo:rgba(255,255,255,.05); --heat-hi:#6b62f2;
+      --dim:rgba(0,0,0,.72);
+      --shadow:0 8px 30px rgba(0,0,0,.5);
+      --shadow-lg:0 24px 60px rgba(0,0,0,.62);
     }
   }
   :root[data-theme="light"]{
-    --page:#F9FAFB; --paper:#FFFFFF;
-    --ink:#191F28; --ink2:#4E5968; --ink3:#8B95A1; --ink4:#B0B8C1;
-    --line:#E5E8EB; --fill:#F2F4F6; --fill2:#F9FAFB;
-    --blue:#3182F6; --blue-dn:#1B64DA; --blue-bg:#E8F3FF; --blue-ink:#1B64DA;
-    --red:#F04452; --red-bg:#FDEBEC;
-    --orange:#E8730A; --orange-bg:#FFF3E0;
-    --heat-lo:#EDF2F7; --heat-hi:#3182F6;
-    --dim:rgba(0,23,51,.45);
-    --shadow:0 16px 40px rgba(0,27,55,.12);
-    --shadow-lg:0 24px 64px rgba(0,27,55,.2);
+    --page:#f4f4f5; --paper:#ffffff;
+    --ink:#161616; --ink2:#525252; --ink3:#8a8a8a; --ink4:#b3b3b3;
+    --line:#e5e5e5; --fill:#f1f1f2; --fill2:#fafafa;
+    --accent:#161616; --accent-on:#ffffff;
+    --blue:#161616; --blue-dn:#000000; --blue-bg:#f0f0f2; --blue-ink:#161616;
+    --red:#d1444f; --red-bg:#fbeaec;
+    --orange:#a86a17; --orange-bg:#f5efe3;
+    --heat-lo:#ededee; --heat-hi:#6b62f2;
+    --dim:rgba(10,10,12,.42);
+    --shadow:0 8px 30px rgba(20,20,30,.08);
+    --shadow-lg:0 24px 60px rgba(20,20,30,.16);
   }
   :root[data-theme="dark"]{
-    --page:#101013; --paper:#17171C;
-    --ink:#E5E8EB; --ink2:#9EA4AA; --ink3:#6B7684; --ink4:#4E5968;
-    --line:#2C2C35; --fill:#26262C; --fill2:#1E1E24;
-    --blue:#4593FC; --blue-dn:#6FA9F7; --blue-bg:#16304F; --blue-ink:#7CB2FC;
-    --red:#F26B76; --red-bg:#3D1F24;
-    --orange:#F0A146; --orange-bg:#3A2B12;
-    --heat-lo:#1E242C; --heat-hi:#3B87F0;
-    --dim:rgba(0,0,0,.6);
-    --shadow:0 16px 40px rgba(0,0,0,.45);
-    --shadow-lg:0 24px 64px rgba(0,0,0,.6);
+    --page:#0a0a0a; --paper:#161616;
+    --ink:#ededed; --ink2:#c2c2c2; --ink3:#8f8f8f; --ink4:#6b6b6b;
+    --line:rgba(255,255,255,.12); --fill:rgba(212,212,212,.10); --fill2:rgba(212,212,212,.05);
+    --accent:#ffffff; --accent-on:#161616;
+    --blue:#ffffff; --blue-dn:#d4d4d4; --blue-bg:rgba(255,255,255,.09); --blue-ink:#ededed;
+    --red:#f0868f; --red-bg:rgba(240,134,143,.14);
+    --orange:#e0a35c; --orange-bg:rgba(224,163,92,.14);
+    --heat-lo:rgba(255,255,255,.05); --heat-hi:#6b62f2;
+    --dim:rgba(0,0,0,.72);
+    --shadow:0 8px 30px rgba(0,0,0,.5);
+    --shadow-lg:0 24px 60px rgba(0,0,0,.62);
   }
 
   *,*::before,*::after{box-sizing:border-box}
@@ -62,8 +82,9 @@
   [hidden]{display:none !important}
   body{
     background:var(--page); color:var(--ink);
-    font-family:"Toss Product Sans","Pretendard Variable",Pretendard,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",system-ui,sans-serif;
+    font-family:var(--font-body);
     font-size:15px; line-height:1.6; -webkit-font-smoothing:antialiased;
+    letter-spacing:.005em;
     word-break:keep-all; overflow-wrap:break-word;
   }
   button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
@@ -455,6 +476,60 @@
   .metric::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--blue);flex:none;transform:translateY(-2px)}
   .metric b{color:var(--ink)}
   .foot{margin-top:64px;border-top:1px solid var(--line);padding-top:20px;font-size:12.5px;color:var(--ink3);line-height:1.75;max-width:720px;margin-left:auto;margin-right:auto}
+
+  /* ══ Dimension overrides ═══════════════════════════════════════════
+     pill silhouettes, inverted white/near-black CTAs, hairline elevation,
+     DM Sans / Geist faces at weight-500 restraint, and the sparing gradient moments. */
+
+  /* the signature dusk-violet wash as the floating nav underline */
+  .demo-bar{border-bottom:none}
+  .demo-bar::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:var(--grad-violet)}
+
+  /* editorial hero: DM Sans display at medium weight + a soft violet radial spotlight */
+  .hero{position:relative}
+  .hero::before{content:"";position:absolute;left:-56px;top:-48px;width:360px;height:260px;
+    background:radial-gradient(closest-side, rgba(107,98,242,.30), rgba(107,98,242,0) 72%);
+    pointer-events:none;z-index:0}
+  .hero > *{position:relative;z-index:1}
+  .eyebrow{color:var(--ink3);letter-spacing:.16em}
+  .hero h1{font-weight:500;letter-spacing:-.03em}
+
+  /* brand marks carry the warm→cool hero gradient (the one full-colour signature) */
+  .brand-mark,.home-mark{background:var(--grad-hero);color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.32)}
+
+  /* primary action = filled pill, inverted against the canvas */
+  .cta{background:var(--accent);color:var(--accent-on);border-radius:var(--r-pill)}
+  .cta:hover:not(:disabled){background:var(--blue-dn)}
+  .cta:disabled{background:var(--fill);color:var(--ink4)}
+  .cal-btn{background:var(--accent);color:var(--accent-on);border-radius:var(--r-pill)}
+  .cal-btn:hover{background:var(--blue-dn)}
+
+  /* pill-ify tags, chips, step + attendee segments */
+  .chip,.mode,.quick-chip{border-radius:var(--r-pill)}
+  .step.on .sn{background:var(--accent);color:var(--accent-on)}
+
+  /* recommendation "best" badge + confirmed heat cell = inverted fill */
+  .reco-best{background:var(--accent);color:var(--accent-on)}
+  .hm-cell.confirmed::after{background:var(--accent);color:var(--accent-on)}
+  .reco.sel{box-shadow:0 0 0 2px var(--accent)}
+
+  /* the newly-booked calendar block: inverted fill, hairline elevation, no coloured glow */
+  .cal-ev.new{background:var(--accent);color:var(--accent-on);border-left-color:var(--accent);box-shadow:none}
+  .cal-ev.new small{color:var(--accent-on);opacity:.72}
+  .cal-ev .new-tag{background:color-mix(in oklab,var(--accent-on) 18%,transparent);color:var(--accent-on)}
+
+  /* success reveal: violet radial spotlight instead of a flat fill */
+  .done-check{background:var(--grad-radial);box-shadow:0 0 0 6px color-mix(in oklab,var(--violet) 16%,transparent),0 14px 40px color-mix(in oklab,var(--violet) 34%,transparent)}
+  .done-title{font-weight:500;letter-spacing:-.02em}
+
+  /* section headings adopt Geist's product-precise texture at medium/semibold */
+  .h-title{font-weight:500;letter-spacing:-.025em}
+  .sec h2{font-family:var(--font-geist);font-weight:600;letter-spacing:-.02em}
+  .sec-no{color:var(--ink3)}
+  .reco-time,.panel-time{font-weight:600}
+
+  /* elevation via hairline translucency, never heavy shadow */
+  .seg button[aria-pressed="true"]{box-shadow:none;border:1px solid var(--line)}
 </style>
 </head>
 <body>
@@ -783,7 +858,8 @@
   function timeOf(i){ var m=540+i*30; return Math.floor(m/60)+":"+String(m%60).padStart(2,"0"); }
   function toMin(t){ var p=t.split(":"); return (+p[0])*60+(+p[1]); }
 
-  var AVATAR = ["#3182F6","#00A86B","#8B5CF6","#E8618C","#0FA5A8","#C98007"];
+  // Dimension: harmonized muted-dusk identity palette (6 people), not a saturated rainbow
+  var AVATAR = ["#5b6cb0","#3f8a80","#7a6bb5","#b06d86","#5e7a9e","#a5803f"];
 
   var PEOPLE = [
     { id:"jy", name:"김지영", job:"프로덕트 디자이너 · 캘린더 연동", me:true, role:"required", method:"cal",
