@@ -1,0 +1,836 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>겹 — 계산은 시스템이, 배려는 조용히</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700&family=Instrument+Serif&family=Noto+Sans+KR:wght@500;600;700&family=Noto+Serif+KR:wght@400&display=swap" rel="stylesheet">
+<style>
+/* =============================================================
+   Subframe — graphite blueprint on warm vellum
+   Strictly monochrome. Depth = lightness steps + hairlines.
+   No drop shadows. No chroma. No radius below 12px.
+   ============================================================= */
+:root{
+  --color-page-canvas:#fafafa;
+  --color-hairline-border:#e5e7eb;
+  --color-card-surface:#ededed;
+  --color-divider-mid:#dadada;
+  --color-graphite:#242424;
+  --color-ink-black:#171717;
+  --color-pencil:#5c5c5c;
+  --color-faint-graphite:#a3a3a3;
+
+  --font-inter:'Inter','Noto Sans KR',-apple-system,'Apple SD Gothic Neo',sans-serif;
+  --font-instrument-serif:'Instrument Serif','Noto Serif KR','Playfair Display',Georgia,serif;
+
+  /* graphite hatching — the monochrome stand-in for "soft avoid" */
+  --hatch:repeating-linear-gradient(-45deg,
+          rgba(23,23,23,.32) 0 1.5px, transparent 1.5px 6px);
+  --hatch-soft:repeating-linear-gradient(-45deg,
+          rgba(23,23,23,.20) 0 1.5px, transparent 1.5px 6px);
+
+  --radius-control:16px;
+  --radius-container:24px;
+  --radius-pill:9999px;
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--color-page-canvas);
+  color:var(--color-ink-black);
+  font-family:var(--font-inter);
+  font-weight:500;
+  font-size:18px;
+  line-height:1.33;
+  letter-spacing:-0.45px;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--color-graphite);color:var(--color-page-canvas)}
+
+.serif{font-family:var(--font-instrument-serif);font-weight:400;letter-spacing:-0.02em;font-style:normal}
+
+.body-sm{font-size:14px;line-height:1.43;letter-spacing:-0.07px}
+.pencil{color:var(--color-pencil)}
+.faint{color:var(--color-faint-graphite)}
+
+.wrap{max-width:1160px;margin:0 auto;padding:0 32px}
+
+/* ---------- Buttons ---------- */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  font-family:var(--font-inter);font-weight:600;font-size:15px;letter-spacing:-0.2px;
+  border-radius:var(--radius-control);padding:13px 22px;cursor:pointer;
+  border:none;transition:background .18s ease,transform .12s ease,border-color .18s ease;
+  white-space:nowrap;
+}
+.btn:active{transform:translateY(1px)}
+.btn-dark{
+  background:var(--color-graphite);color:var(--color-page-canvas);
+  /* inset highlight: pressed-in graphite, never flat */
+  box-shadow:inset 0 1px 0 rgba(250,250,250,.22), inset 0 -1px 0 rgba(0,0,0,.28);
+}
+.btn-dark:hover{background:var(--color-ink-black)}
+.btn-ghost{
+  background:transparent;color:var(--color-ink-black);
+  border:1px solid var(--color-hairline-border);
+}
+.btn-ghost:hover{border-color:var(--color-faint-graphite)}
+.btn-sm{padding:9px 16px;font-size:14px}
+
+/* ---------- Top navigation ---------- */
+.nav{
+  position:sticky;top:0;z-index:50;
+  background:rgba(250,250,250,.92);backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--color-hairline-border);
+}
+.nav-inner{display:flex;align-items:center;gap:40px;height:72px}
+.logo{display:flex;align-items:baseline;gap:10px;text-decoration:none;color:var(--color-ink-black)}
+.logo .mark{font-family:var(--font-instrument-serif);font-size:30px;line-height:1}
+.logo .word{font-size:13px;font-weight:600;letter-spacing:.14em;color:var(--color-faint-graphite);text-transform:uppercase}
+.nav-links{display:flex;gap:28px;flex:1}
+.nav-links a{
+  text-decoration:none;font-size:15px;font-weight:500;letter-spacing:-0.2px;
+  color:var(--color-faint-graphite);transition:color .15s ease;
+}
+.nav-links a:hover{color:var(--color-ink-black)}
+.nav-links a.active{color:var(--color-ink-black);font-weight:600}
+
+/* ---------- Hero ---------- */
+.hero{padding:72px 0 56px;text-align:center}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:10px;
+  font-size:13px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--color-pencil);
+  border:1px solid var(--color-hairline-border);border-radius:var(--radius-pill);
+  padding:8px 18px;margin-bottom:28px;background:var(--color-page-canvas);
+}
+.eyebrow .dot{width:6px;height:6px;border-radius:var(--radius-pill);background:var(--color-graphite)}
+h1{
+  font-size:48px;line-height:1.13;letter-spacing:-1.2px;font-weight:700;
+  max-width:760px;margin:0 auto;
+}
+h1 .serif{font-size:1.12em;padding:0 .04em}
+.hero p{
+  max-width:560px;margin:22px auto 0;color:var(--color-pencil);
+  font-size:18px;line-height:1.55;letter-spacing:-0.3px;
+}
+
+/* ---------- Segmented view switch ---------- */
+.seg{
+  display:inline-flex;gap:4px;margin-top:40px;padding:5px;
+  border:1px solid var(--color-hairline-border);border-radius:var(--radius-pill);
+  background:var(--color-page-canvas);
+}
+.seg button{
+  border:none;background:transparent;cursor:pointer;
+  font-family:var(--font-inter);font-size:15px;font-weight:600;letter-spacing:-0.2px;
+  color:var(--color-pencil);padding:11px 26px;border-radius:var(--radius-pill);
+  transition:background .18s ease,color .18s ease;
+}
+.seg button:hover{color:var(--color-ink-black)}
+.seg button.on{
+  background:var(--color-graphite);color:var(--color-page-canvas);
+  box-shadow:inset 0 1px 0 rgba(250,250,250,.2);
+}
+.seg .hint{align-self:center;padding:0 14px 0 6px}
+
+/* ---------- Layout ---------- */
+.stage{padding:16px 0 96px}
+.view{display:none}
+.view.show{display:block;animation:rise .35s ease}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+.grid-organizer{display:grid;grid-template-columns:340px 1fr;gap:24px;align-items:start}
+@media (max-width:960px){.grid-organizer{grid-template-columns:1fr}}
+
+/* ---------- Cards ---------- */
+.card{
+  background:var(--color-card-surface);
+  border-radius:var(--radius-container);
+  padding:28px;
+}
+.card-title{font-size:15px;font-weight:700;letter-spacing:-0.2px;margin-bottom:4px}
+.card-sub{font-size:14px;line-height:1.43;letter-spacing:-0.07px;color:var(--color-pencil)}
+.hr{border:none;border-top:1px solid var(--color-divider-mid);margin:22px 0}
+
+/* ---------- Condition panel ---------- */
+.people{display:flex;flex-direction:column;gap:6px;margin-top:16px}
+.person{
+  display:flex;align-items:center;gap:12px;
+  padding:10px 12px;border-radius:var(--radius-control);
+  transition:background .15s ease;
+}
+.person:hover{background:rgba(250,250,250,.7)}
+.avatar{
+  width:36px;height:36px;border-radius:var(--radius-pill);flex:none;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-instrument-serif);font-size:17px;
+  background:var(--color-page-canvas);border:1px solid var(--color-divider-mid);
+  color:var(--color-ink-black);
+}
+.avatar.out{background:var(--hatch-soft),var(--color-page-canvas)}
+.person .who{flex:1;min-width:0}
+.person .name{display:block;font-size:15px;font-weight:600;letter-spacing:-0.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.person .role{display:block;font-size:12.5px;letter-spacing:-0.05px;color:var(--color-faint-graphite);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.req{
+  display:inline-flex;padding:3px;gap:2px;flex:none;
+  border:1px solid var(--color-divider-mid);border-radius:var(--radius-pill);
+  background:var(--color-page-canvas);
+}
+.req button{
+  border:none;background:transparent;cursor:pointer;border-radius:var(--radius-pill);
+  font-family:var(--font-inter);font-size:12px;font-weight:600;letter-spacing:-0.05px;
+  color:var(--color-faint-graphite);padding:5px 11px;
+  transition:background .15s ease,color .15s ease;
+}
+.req button.on{background:var(--color-graphite);color:var(--color-page-canvas)}
+
+.field{margin-top:4px}
+.field-label{font-size:13px;font-weight:600;letter-spacing:-0.05px;color:var(--color-pencil);margin-bottom:10px}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{
+  border:1px solid var(--color-divider-mid);background:var(--color-page-canvas);
+  color:var(--color-pencil);cursor:pointer;
+  font-family:var(--font-inter);font-size:14px;font-weight:600;letter-spacing:-0.1px;
+  padding:9px 16px;border-radius:var(--radius-control);
+  transition:all .15s ease;
+}
+.chip:hover{border-color:var(--color-faint-graphite);color:var(--color-ink-black)}
+.chip.on{background:var(--color-graphite);border-color:var(--color-graphite);color:var(--color-page-canvas);
+  box-shadow:inset 0 1px 0 rgba(250,250,250,.2)}
+
+.switch-row{display:flex;align-items:flex-start;gap:14px;margin-top:20px;cursor:pointer}
+.switch-row .txt b{display:block;font-size:15px;font-weight:600;letter-spacing:-0.2px}
+.switch-row .txt span{display:block;font-size:13px;line-height:1.45;color:var(--color-pencil);margin-top:3px}
+.switch{
+  flex:none;width:46px;height:27px;border-radius:var(--radius-pill);margin-top:2px;
+  background:var(--color-divider-mid);position:relative;transition:background .2s ease;
+  border:none;cursor:pointer;
+}
+.switch::after{
+  content:"";position:absolute;top:3px;left:3px;width:21px;height:21px;
+  border-radius:var(--radius-pill);background:var(--color-page-canvas);
+  transition:transform .2s ease;
+  box-shadow:inset 0 -1px 0 rgba(23,23,23,.12);
+}
+.switch.on{background:var(--color-graphite)}
+.switch.on::after{transform:translateX(19px)}
+
+.recalc{width:100%;margin-top:24px}
+.recalc-note{text-align:center;font-size:13px;color:var(--color-faint-graphite);margin-top:12px;letter-spacing:-0.05px}
+
+/* ---------- Recommendation cards ---------- */
+.recs-head{display:flex;align-items:baseline;justify-content:space-between;margin:6px 4px 18px}
+.recs-head h2{font-size:24px;line-height:1.17;letter-spacing:-0.6px;font-weight:700}
+.recs-head h2 .serif{font-size:1.15em}
+.recs-head .meta{font-size:14px;color:var(--color-faint-graphite);letter-spacing:-0.07px}
+
+.rec{
+  display:grid;grid-template-columns:72px 1fr auto;gap:24px;align-items:center;
+  background:var(--color-card-surface);border-radius:var(--radius-container);
+  padding:26px 28px;margin-bottom:14px;cursor:pointer;position:relative;
+  border:2px solid transparent;
+  transition:border-color .18s ease,background .18s ease;
+}
+.rec:hover{border-color:var(--color-divider-mid)}
+.rec.selected{border-color:var(--color-ink-black)}
+.rec.selected::after{
+  content:"선택됨";position:absolute;top:-11px;right:24px;
+  background:var(--color-graphite);color:var(--color-page-canvas);
+  font-size:11.5px;font-weight:600;letter-spacing:.02em;
+  padding:4px 12px;border-radius:var(--radius-pill);
+  box-shadow:inset 0 1px 0 rgba(250,250,250,.2);
+}
+.rec .rank{
+  font-family:var(--font-instrument-serif);font-size:54px;line-height:1;
+  color:var(--color-ink-black);text-align:center;
+}
+.rec .rank small{
+  display:block;font-family:var(--font-inter);font-size:10.5px;font-weight:600;
+  letter-spacing:.12em;color:var(--color-faint-graphite);margin-top:6px;text-transform:uppercase;
+}
+.rec .when{font-size:20px;font-weight:700;letter-spacing:-0.5px}
+.rec .when em{font-style:normal;color:var(--color-pencil);font-weight:500;font-size:16px;margin-left:8px}
+.rec .why{
+  font-size:14px;line-height:1.5;letter-spacing:-0.07px;color:var(--color-pencil);
+  margin-top:7px;max-width:520px;
+}
+.badges{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+.badge{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:12.5px;font-weight:600;letter-spacing:-0.05px;color:var(--color-pencil);
+  border:1px solid var(--color-divider-mid);border-radius:var(--radius-pill);
+  padding:5px 12px;background:var(--color-page-canvas);
+}
+.badge .swatch{width:10px;height:10px;border-radius:12px;flex:none;border:1px solid var(--color-divider-mid)}
+.badge .swatch.hatch{background:var(--hatch),var(--color-page-canvas)}
+.badge .swatch.full{background:var(--color-graphite);border-color:var(--color-graphite)}
+
+/* temperature — abstracted comfort, strictly grayscale */
+.temp{display:flex;flex-direction:column;align-items:flex-end;gap:10px;min-width:150px}
+.temp .deg{
+  font-family:var(--font-instrument-serif);font-size:40px;line-height:1;
+  color:var(--color-ink-black);
+}
+.temp .deg small{font-size:.45em;color:var(--color-faint-graphite);font-family:var(--font-inter);font-weight:600;letter-spacing:0}
+.temp-bar{display:flex;gap:3px}
+.temp-bar i{
+  width:18px;height:7px;border-radius:var(--radius-pill);background:var(--color-ink-black);
+}
+.temp-bar i.warm{opacity:.95}
+.temp-bar i.mild{opacity:.38}
+.temp-bar i.cool{opacity:.14}
+.temp .cap{font-size:11.5px;letter-spacing:-0.02px;color:var(--color-faint-graphite)}
+
+/* ---------- Heatmap (why this time?) ---------- */
+.map-card{margin-top:26px}
+.map-head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.map-grid-wrap{
+  margin-top:20px;background:var(--color-page-canvas);
+  border-radius:var(--radius-control);padding:18px;overflow-x:auto;
+}
+.map-grid{
+  display:grid;grid-template-columns:52px repeat(5,1fr);gap:3px;min-width:560px;
+}
+.map-grid .dh,.paint-grid .dh{
+  font-size:12.5px;font-weight:600;letter-spacing:-0.05px;color:var(--color-pencil);
+  text-align:center;padding:6px 0 10px;
+}
+.map-grid .dh b,.paint-grid .dh b{display:block;font-size:14px;color:var(--color-ink-black);letter-spacing:-0.1px}
+.map-grid .th,.paint-grid .th{
+  font-size:11.5px;color:var(--color-faint-graphite);letter-spacing:-0.02px;
+  display:flex;align-items:center;justify-content:flex-end;padding-right:10px;
+}
+.cell{
+  height:34px;position:relative;background:transparent;
+  outline:1px solid var(--color-hairline-border);outline-offset:-0.5px;
+}
+.cell.lv1{background:rgba(23,23,23,.07)}
+.cell.lv2{background:rgba(23,23,23,.16)}
+.cell.lv3{background:rgba(23,23,23,.30)}
+.cell.block{background:var(--color-graphite)}
+.cell.avoid::before{
+  content:"";position:absolute;inset:0;background:var(--hatch);
+}
+.cell.rec{outline:2px solid var(--color-ink-black);outline-offset:-1px;z-index:2}
+.cell.rec::after{
+  content:attr(data-rank);position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:20px;height:20px;border-radius:var(--radius-pill);
+  background:var(--color-graphite);color:var(--color-page-canvas);
+  font-family:var(--font-instrument-serif);font-size:13px;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:inset 0 1px 0 rgba(250,250,250,.25);
+}
+.legend{display:flex;gap:20px;flex-wrap:wrap;margin-top:18px}
+.legend .item{display:flex;align-items:center;gap:9px;font-size:13px;letter-spacing:-0.05px;color:var(--color-pencil)}
+.legend .k{width:32px;height:14px;border-radius:12px;border:1px solid var(--color-divider-mid);flex:none;background:var(--color-page-canvas)}
+.legend .k.grad{background:linear-gradient(90deg,rgba(23,23,23,0),rgba(23,23,23,.30));border-color:var(--color-hairline-border)}
+.legend .k.hatch{background:var(--hatch),var(--color-page-canvas)}
+.legend .k.full{background:var(--color-graphite);border-color:var(--color-graphite)}
+.legend .k.ring{outline:2px solid var(--color-ink-black);outline-offset:-2px;border-color:transparent}
+.map-note{
+  margin-top:18px;padding-top:18px;border-top:1px solid var(--color-divider-mid);
+  font-size:14px;line-height:1.55;letter-spacing:-0.07px;color:var(--color-pencil);
+}
+.map-note b{color:var(--color-ink-black);font-weight:600}
+
+/* ---------- Participant view ---------- */
+.grid-participant{display:grid;grid-template-columns:400px 1fr;gap:24px;align-items:start}
+@media (max-width:960px){.grid-participant{grid-template-columns:1fr}}
+
+.brushes{display:flex;flex-direction:column;gap:10px;margin-top:20px}
+.brush{
+  display:flex;align-items:flex-start;gap:14px;text-align:left;cursor:pointer;
+  background:var(--color-page-canvas);border:1px solid var(--color-divider-mid);
+  border-radius:var(--radius-control);padding:16px;width:100%;
+  font-family:var(--font-inter);transition:border-color .15s ease;
+}
+.brush:hover{border-color:var(--color-faint-graphite)}
+.brush.on{border:2px solid var(--color-ink-black);padding:15px}
+.brush .sw{
+  width:40px;height:40px;border-radius:12px;flex:none;
+  border:1px solid var(--color-divider-mid);background:var(--color-page-canvas);
+}
+.brush .sw.hatch{background:var(--hatch),var(--color-page-canvas)}
+.brush .sw.full{background:var(--color-graphite);border-color:var(--color-graphite);
+  box-shadow:inset 0 1px 0 rgba(250,250,250,.18)}
+.brush b{display:block;font-size:15.5px;font-weight:600;letter-spacing:-0.2px;color:var(--color-ink-black)}
+.brush span{display:block;font-size:13.5px;line-height:1.5;letter-spacing:-0.05px;color:var(--color-pencil);margin-top:3px}
+
+.privacy{
+  margin-top:22px;padding:18px;border-radius:var(--radius-control);
+  background:var(--color-page-canvas);
+  font-size:13.5px;line-height:1.6;letter-spacing:-0.05px;color:var(--color-pencil);
+}
+.privacy b{color:var(--color-ink-black);font-weight:600}
+.privacy .row{display:flex;gap:10px}
+.privacy .row + .row{margin-top:10px;padding-top:10px;border-top:1px solid var(--color-hairline-border)}
+.privacy .ico{font-family:var(--font-instrument-serif);font-size:16px;color:var(--color-ink-black);flex:none}
+
+.paint-grid{
+  display:grid;grid-template-columns:52px repeat(5,1fr);gap:3px;min-width:560px;
+}
+.paint-grid .pcell{
+  height:38px;border:none;cursor:pointer;background:transparent;
+  outline:1px solid var(--color-hairline-border);outline-offset:-0.5px;
+  position:relative;transition:outline-color .1s ease;
+  padding:0;
+}
+.paint-grid .pcell:hover{outline:1.5px solid var(--color-faint-graphite);z-index:2}
+.paint-grid .pcell.avoid{background:var(--hatch),transparent}
+.paint-grid .pcell.hard{background:var(--color-graphite)}
+.paint-grid .pcell.fixed{background:rgba(23,23,23,.10);cursor:default}
+.paint-grid .pcell.fixed::after{
+  content:attr(data-ev);font-size:10.5px;font-weight:600;letter-spacing:-0.02px;
+  color:var(--color-pencil);position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;overflow:hidden;
+}
+.paint-status{
+  margin-top:18px;display:flex;align-items:center;gap:10px;
+  font-size:14px;line-height:1.5;letter-spacing:-0.07px;color:var(--color-pencil);
+  min-height:24px;transition:opacity .2s ease;
+}
+.paint-status .tick{
+  font-family:var(--font-instrument-serif);font-size:17px;color:var(--color-ink-black);
+}
+.paint-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:22px}
+
+/* ---------- Footer ---------- */
+footer{border-top:1px solid var(--color-hairline-border);padding:36px 0 48px}
+.foot{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.foot .sig{font-family:var(--font-instrument-serif);font-size:20px}
+.foot p{font-size:13px;color:var(--color-faint-graphite);letter-spacing:-0.02px}
+</style>
+</head>
+<body>
+
+<!-- ======================= NAV ======================= -->
+<nav class="nav">
+  <div class="wrap nav-inner">
+    <a class="logo" href="#">
+      <span class="mark serif">겹</span>
+      <span class="word">gyeop</span>
+    </a>
+    <div class="nav-links">
+      <a href="#" class="active">모임 만들기</a>
+      <a href="#">내 캘린더</a>
+      <a href="#">지난 모임</a>
+    </div>
+    <button class="btn btn-dark btn-sm">+ 새 모임</button>
+  </div>
+</nav>
+
+<!-- ======================= HERO ======================= -->
+<header class="hero wrap">
+  <span class="eyebrow"><span class="dot"></span>7월 3주 · 주간 전략 회의</span>
+  <h1>여섯 명의 시간을 겹쳐 보는 대신,<br><span class="serif">Top&nbsp;3</span>부터 받아 보세요.</h1>
+  <p>필수 참석 여부, 외근 동선, 그리고 말하기 어려웠던 각자의 사정까지 —
+  복잡한 계산은 시스템이 하고, 당신은 세 개 중 하나만 고르면 돼요.</p>
+
+  <div class="seg" role="tablist" aria-label="화면 전환">
+    <button class="on" role="tab" aria-selected="true" data-view="organizer">주최자 화면</button>
+    <button role="tab" aria-selected="false" data-view="participant">참석자 화면</button>
+  </div>
+</header>
+
+<!-- ======================= ORGANIZER VIEW ======================= -->
+<main class="stage wrap">
+<section class="view show" id="view-organizer" role="tabpanel">
+  <div class="grid-organizer">
+
+    <!-- left: conditions -->
+    <aside class="card">
+      <div class="card-title">모임 조건</div>
+      <div class="card-sub">조건이 바뀌면 추천도 즉시 다시 계산돼요.</div>
+
+      <div class="people">
+        <div class="person">
+          <span class="avatar serif">서</span>
+          <span class="who"><span class="name">서지영 <span class="faint body-sm">(나)</span></span><span class="role">주최자 · 프로덕트</span></span>
+          <span class="req"><button class="on">필수</button><button>선택</button></span>
+        </div>
+        <div class="person">
+          <span class="avatar serif">김</span>
+          <span class="who"><span class="name">김도윤</span><span class="role">디자인</span></span>
+          <span class="req"><button class="on">필수</button><button>선택</button></span>
+        </div>
+        <div class="person">
+          <span class="avatar serif out">박</span>
+          <span class="who"><span class="name">박세라</span><span class="role">개발 · 수요일 오전 외근</span></span>
+          <span class="req"><button class="on">필수</button><button>선택</button></span>
+        </div>
+        <div class="person">
+          <span class="avatar serif">이</span>
+          <span class="who"><span class="name">이준호</span><span class="role">개발</span></span>
+          <span class="req"><button>필수</button><button class="on">선택</button></span>
+        </div>
+        <div class="person">
+          <span class="avatar serif">최</span>
+          <span class="who"><span class="name">최민아</span><span class="role">마케팅</span></span>
+          <span class="req"><button>필수</button><button class="on">선택</button></span>
+        </div>
+        <div class="person">
+          <span class="avatar serif">한</span>
+          <span class="who"><span class="name">한결</span><span class="role">데이터</span></span>
+          <span class="req"><button>필수</button><button class="on">선택</button></span>
+        </div>
+      </div>
+
+      <hr class="hr">
+
+      <div class="field">
+        <div class="field-label">회의 길이</div>
+        <div class="chips" data-single>
+          <button class="chip">30분</button>
+          <button class="chip on">1시간</button>
+          <button class="chip">90분</button>
+        </div>
+      </div>
+
+      <div class="field" style="margin-top:20px">
+        <div class="field-label">찾는 기간</div>
+        <div class="chips" data-single>
+          <button class="chip on">이번 주 (7/13–17)</button>
+          <button class="chip">다음 주</button>
+        </div>
+      </div>
+
+      <label class="switch-row">
+        <button class="switch on" role="switch" aria-checked="true" aria-label="외근 이동 시간 고려"></button>
+        <span class="txt">
+          <b>외근 이동 시간 고려</b>
+          <span>세라 님의 수요일 외근 앞뒤로 30분을 비워 두고 계산해요.</span>
+        </span>
+      </label>
+
+      <label class="switch-row">
+        <button class="switch on" role="switch" aria-checked="true" aria-label="피하고 싶은 시간 존중"></button>
+        <span class="txt">
+          <b>‘피하고 싶은 시간’ 존중</b>
+          <span>가능하긴 해도 누군가 피하고 싶어 한 시간은 순위를 낮춰요.</span>
+        </span>
+      </label>
+
+      <button class="btn btn-dark recalc">추천 다시 계산하기</button>
+      <div class="recalc-note">계산은 3초면 충분해요. 눈치 계산은 0초.</div>
+    </aside>
+
+    <!-- right: recommendations + heatmap -->
+    <div>
+      <div class="recs-head">
+        <h2>가장 좋은 시간 <span class="serif">Top 3</span></h2>
+        <span class="meta">방금 계산됨 · 6명 중 6명 응답</span>
+      </div>
+
+      <!-- rank 1 -->
+      <article class="rec selected" tabindex="0">
+        <div class="rank serif">1<small>Best</small></div>
+        <div>
+          <div class="when">목요일 7/16 · 10:30 – 11:30 <em>오전</em></div>
+          <p class="why">여섯 명 모두 ‘괜찮아요’로 겹치는 유일한 시간이에요. 피하고 싶어 한 사람도, 이동 부담도 없어요.</p>
+          <div class="badges">
+            <span class="badge">필수 3/3 참석</span>
+            <span class="badge">전원 6/6 가능</span>
+            <span class="badge"><span class="swatch hatch"></span>피하고 싶은 시간 0명</span>
+          </div>
+        </div>
+        <div class="temp">
+          <span class="deg serif">96<small>°</small></span>
+          <span class="temp-bar" aria-label="참석 온도: 여섯 명 모두 편안함">
+            <i class="warm"></i><i class="warm"></i><i class="warm"></i><i class="warm"></i><i class="warm"></i><i class="warm"></i>
+          </span>
+          <span class="cap">모임 온도 · 이름 없이 합산돼요</span>
+        </div>
+      </article>
+
+      <!-- rank 2 -->
+      <article class="rec" tabindex="0">
+        <div class="rank serif">2<small>Alt</small></div>
+        <div>
+          <div class="when">화요일 7/14 · 14:00 – 15:00 <em>오후</em></div>
+          <p class="why">모두 가능하지만, 한 분이 조용히 피하고 싶어 한 시간이에요. 급한 안건이라면 무리 없는 선택이에요.</p>
+          <div class="badges">
+            <span class="badge">필수 3/3 참석</span>
+            <span class="badge">전원 6/6 가능</span>
+            <span class="badge"><span class="swatch hatch"></span>피하고 싶은 시간 1명</span>
+          </div>
+        </div>
+        <div class="temp">
+          <span class="deg serif">88<small>°</small></span>
+          <span class="temp-bar" aria-label="참석 온도: 다섯 명 편안, 한 명 조금 무거움">
+            <i class="warm"></i><i class="warm"></i><i class="warm"></i><i class="warm"></i><i class="warm"></i><i class="mild"></i>
+          </span>
+          <span class="cap">모임 온도 · 이름 없이 합산돼요</span>
+        </div>
+      </article>
+
+      <!-- rank 3 -->
+      <article class="rec" tabindex="0">
+        <div class="rank serif">3<small>Alt</small></div>
+        <div>
+          <div class="when">금요일 7/17 · 16:00 – 17:00 <em>오후</em></div>
+          <p class="why">세라 님의 외근 복귀 후 30분을 비워 두고 잡은 시간이에요. 선택 참석자 한 분은 어려울 수 있어요.</p>
+          <div class="badges">
+            <span class="badge">필수 3/3 참석</span>
+            <span class="badge">5/6 가능</span>
+            <span class="badge"><span class="swatch full"></span>이동 시간 반영됨</span>
+          </div>
+        </div>
+        <div class="temp">
+          <span class="deg serif">81<small>°</small></span>
+          <span class="temp-bar" aria-label="참석 온도: 네 명 편안, 한 명 조금 무거움, 한 명 어려움">
+            <i class="warm"></i><i class="warm"></i><i class="warm"></i><i class="warm"></i><i class="mild"></i><i class="cool"></i>
+          </span>
+          <span class="cap">모임 온도 · 이름 없이 합산돼요</span>
+        </div>
+      </article>
+
+      <div class="paint-actions" style="margin-top:20px">
+        <button class="btn btn-ghost">다른 시간 직접 보기</button>
+        <button class="btn btn-dark" id="proposeBtn">목 10:30으로 초대 보내기</button>
+      </div>
+
+      <!-- heatmap -->
+      <section class="card map-card">
+        <div class="map-head">
+          <div>
+            <div class="card-title">왜 이 시간인가요?</div>
+            <div class="card-sub">여섯 명의 한 주를 한 장에 겹쳤어요. 밝을수록 모두 비어 있는 시간이에요.</div>
+          </div>
+          <span class="meta faint body-sm">7/13 – 7/17 · 09:00 – 18:00</span>
+        </div>
+
+        <div class="map-grid-wrap">
+          <div class="map-grid" aria-label="주간 겹침 지도">
+            <span class="th"></span>
+            <span class="dh">월<b>13</b></span><span class="dh">화<b>14</b></span><span class="dh">수<b>15</b></span><span class="dh">목<b>16</b></span><span class="dh">금<b>17</b></span>
+
+            <span class="th">9시</span>
+            <span class="cell lv2"></span><span class="cell lv1"></span><span class="cell block" title="필수 참석자 외근"></span><span class="cell lv1"></span><span class="cell lv2"></span>
+
+            <span class="th">10시</span>
+            <span class="cell lv3"></span><span class="cell lv2"></span><span class="cell block"></span><span class="cell rec" data-rank="1"></span><span class="cell lv2"></span>
+
+            <span class="th">11시</span>
+            <span class="cell lv2"></span><span class="cell lv1"></span><span class="cell lv1"></span><span class="cell lv1"></span><span class="cell lv3"></span>
+
+            <span class="th">12시</span>
+            <span class="cell lv1"></span><span class="cell lv1"></span><span class="cell lv2"></span><span class="cell lv1"></span><span class="cell lv1"></span>
+
+            <span class="th">13시</span>
+            <span class="cell lv1 avoid"></span><span class="cell avoid"></span><span class="cell lv2"></span><span class="cell avoid"></span><span class="cell lv1 avoid"></span>
+
+            <span class="th">14시</span>
+            <span class="cell lv2"></span><span class="cell rec avoid" data-rank="2"></span><span class="cell lv3"></span><span class="cell lv2"></span><span class="cell block"></span>
+
+            <span class="th">15시</span>
+            <span class="cell block"></span><span class="cell lv1"></span><span class="cell lv2"></span><span class="cell lv3"></span><span class="cell lv1"></span>
+
+            <span class="th">16시</span>
+            <span class="cell lv2"></span><span class="cell lv1"></span><span class="cell lv1"></span><span class="cell lv2"></span><span class="cell rec" data-rank="3"></span>
+
+            <span class="th">17시</span>
+            <span class="cell lv1"></span><span class="cell lv2"></span><span class="cell lv1 avoid"></span><span class="cell lv1"></span><span class="cell lv1"></span>
+          </div>
+        </div>
+
+        <div class="legend">
+          <span class="item"><span class="k grad"></span>어두울수록 겹치는 일정이 많아요</span>
+          <span class="item"><span class="k hatch"></span>누군가 피하고 싶어 한 시간</span>
+          <span class="item"><span class="k full"></span>필수 참석자가 어려운 시간</span>
+          <span class="item"><span class="k ring"></span>추천 Top 3</span>
+        </div>
+
+        <p class="map-note"><b>누가, 왜 피했는지는 여기에도 없어요.</b>
+        개인의 사정은 이름 없이 빗금과 온도로만 합쳐져요. 주최자는 결정에 필요한 만큼만 보고,
+        구성원은 솔직하게 표시할 수 있어요.</p>
+      </section>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= PARTICIPANT VIEW ======================= -->
+<section class="view" id="view-participant" role="tabpanel">
+  <div class="grid-participant">
+
+    <!-- left: brushes + promise -->
+    <aside class="card">
+      <div class="card-title">내 시간 알려주기</div>
+      <div class="card-sub">캘린더 일정은 이미 반영했어요. 나머지는 마음이 시키는 대로 칠해 주세요.</div>
+
+      <div class="brushes" role="radiogroup" aria-label="시간 표시 도구">
+        <button class="brush" data-brush="ok" role="radio" aria-checked="false">
+          <span class="sw"></span>
+          <span><b>괜찮아요</b><span>이 시간이면 편하게 참석할 수 있어요.</span></span>
+        </button>
+        <button class="brush on" data-brush="avoid" role="radio" aria-checked="true">
+          <span class="sw hatch"></span>
+          <span><b>되긴 하는데, 피하고 싶어요</b><span>점심 직후라 졸려도, 그냥 내키지 않아도 괜찮아요. 이유는 묻지 않아요.</span></span>
+        </button>
+        <button class="brush" data-brush="hard" role="radio" aria-checked="false">
+          <span class="sw full"></span>
+          <span><b>어려워요</b><span>이 시간은 확실히 안 돼요. 추천에서 자동으로 빠져요.</span></span>
+        </button>
+      </div>
+
+      <div class="privacy">
+        <div class="row"><span class="ico serif">✳</span>
+          <span><b>이름은 지워지고, 온도만 남아요.</b> 주최자에게는 ‘몇 명이 편한 시간인지’만 합쳐져 보여요.</span></div>
+        <div class="row"><span class="ico serif">✳</span>
+          <span><b>이유는 저장하지 않아요.</b> ‘피하고 싶어요’에 설명을 붙일 칸 자체가 없어요. 일부러요.</span></div>
+        <div class="row"><span class="ico serif">✳</span>
+          <span><b>거절이 아니라 정보예요.</b> 당신의 빗금 하나가 모두의 회의를 한 뼘 편하게 만들어요.</span></div>
+      </div>
+    </aside>
+
+    <!-- right: paintable week -->
+    <div class="card">
+      <div class="map-head">
+        <div>
+          <div class="card-title">7월 13일 – 17일</div>
+          <div class="card-sub">칸을 누르거나 드래그해서 칠해요. 다시 누르면 지워져요.</div>
+        </div>
+        <span class="meta faint body-sm">서지영 님의 주간</span>
+      </div>
+
+      <div class="map-grid-wrap">
+        <div class="paint-grid" id="paintGrid" aria-label="내 주간 시간표">
+          <span class="th"></span>
+          <span class="dh">월<b>13</b></span><span class="dh">화<b>14</b></span><span class="dh">수<b>15</b></span><span class="dh">목<b>16</b></span><span class="dh">금<b>17</b></span>
+          <!-- rows are generated by script; fixed events are declared there -->
+        </div>
+      </div>
+
+      <div class="paint-status" id="paintStatus">
+        <span class="tick serif">—</span>
+        <span>표시한 내용은 저와 당신만 알아요. 편하게 칠해 주세요.</span>
+      </div>
+
+      <div class="paint-actions">
+        <button class="btn btn-ghost">나중에 할게요</button>
+        <button class="btn btn-dark" id="submitBtn">이대로 제출하기</button>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<!-- ======================= FOOTER ======================= -->
+<footer>
+  <div class="wrap foot">
+    <span class="sig serif">겹 — gyeop</span>
+    <p>솔직함이 무례가 되지 않도록, 계산이 부담이 되지 않도록.</p>
+  </div>
+</footer>
+
+<script>
+/* ---------- view switch ---------- */
+const segBtns = document.querySelectorAll('.seg [data-view]');
+segBtns.forEach(b => b.addEventListener('click', () => {
+  segBtns.forEach(x => { x.classList.toggle('on', x === b); x.setAttribute('aria-selected', x === b); });
+  document.querySelectorAll('.view').forEach(v =>
+    v.classList.toggle('show', v.id === 'view-' + b.dataset.view));
+}));
+
+/* ---------- recommendation select ---------- */
+const recs = document.querySelectorAll('.rec');
+const proposeBtn = document.getElementById('proposeBtn');
+const recLabels = ['목 10:30으로 초대 보내기', '화 14:00으로 초대 보내기', '금 16:00으로 초대 보내기'];
+recs.forEach((r, i) => {
+  const pick = () => {
+    recs.forEach(x => x.classList.toggle('selected', x === r));
+    proposeBtn.textContent = recLabels[i];
+  };
+  r.addEventListener('click', pick);
+  r.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(); } });
+});
+
+/* ---------- single-select chip groups ---------- */
+document.querySelectorAll('[data-single]').forEach(g =>
+  g.querySelectorAll('.chip').forEach(c =>
+    c.addEventListener('click', () =>
+      g.querySelectorAll('.chip').forEach(x => x.classList.toggle('on', x === c)))));
+
+/* ---------- switches / req toggles ---------- */
+document.querySelectorAll('.switch').forEach(s =>
+  s.addEventListener('click', e => {
+    e.preventDefault();
+    s.classList.toggle('on');
+    s.setAttribute('aria-checked', s.classList.contains('on'));
+  }));
+document.querySelectorAll('.req').forEach(g =>
+  g.querySelectorAll('button').forEach(b =>
+    b.addEventListener('click', () =>
+      g.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)))));
+
+/* ---------- participant paint grid ---------- */
+const HOURS = ['9시','10시','11시','12시','13시','14시','15시','16시','17시'];
+const FIXED = { '0-1':'주간 싱크', '3-3':'점심 약속', '4-0':'1:1' };  // 'row-col': label
+const PRESET_AVOID = ['4-1','4-3'];                                   // 식후 시간, 미리 칠해둔 예시
+
+const grid = document.getElementById('paintGrid');
+HOURS.forEach((h, r) => {
+  const th = document.createElement('span');
+  th.className = 'th'; th.textContent = h;
+  grid.appendChild(th);
+  for (let c = 0; c < 5; c++) {
+    const key = r + '-' + c;
+    const cell = document.createElement('button');
+    cell.className = 'pcell';
+    cell.setAttribute('aria-label', ['월','화','수','목','금'][c] + ' ' + h);
+    if (FIXED[key]) { cell.classList.add('fixed'); cell.dataset.ev = FIXED[key]; cell.disabled = true; }
+    if (PRESET_AVOID.includes(key)) cell.classList.add('avoid');
+    grid.appendChild(cell);
+  }
+});
+
+let brush = 'avoid', painting = false;
+const brushes = document.querySelectorAll('.brush');
+brushes.forEach(b => b.addEventListener('click', () => {
+  brush = b.dataset.brush;
+  brushes.forEach(x => { x.classList.toggle('on', x === b); x.setAttribute('aria-checked', x === b); });
+}));
+
+const statusEl = document.getElementById('paintStatus');
+const MESSAGES = {
+  ok:    '괜찮은 시간으로 표시했어요.',
+  avoid: '피하고 싶은 시간으로 표시했어요. 이유는 묻지도, 저장하지도 않아요.',
+  hard:  '어려운 시간으로 표시했어요. 이 시간은 추천에서 자동으로 빠져요.',
+  erase: '표시를 지웠어요.'
+};
+function setStatus(kind) {
+  statusEl.innerHTML = '<span class="tick serif">✓</span><span>' + MESSAGES[kind] + '</span>';
+}
+
+function apply(cell) {
+  if (cell.classList.contains('fixed')) return;
+  const had = cell.classList.contains(brush === 'ok' ? '__none__' : brush);
+  cell.classList.remove('avoid', 'hard');
+  if (brush !== 'ok' && !had) cell.classList.add(brush);
+  setStatus(brush === 'ok' ? 'ok' : (had ? 'erase' : brush));
+}
+grid.addEventListener('pointerdown', e => {
+  const cell = e.target.closest('.pcell'); if (!cell) return;
+  painting = true; apply(cell);
+});
+grid.addEventListener('pointerover', e => {
+  if (!painting) return;
+  const cell = e.target.closest('.pcell'); if (cell) apply(cell);
+});
+window.addEventListener('pointerup', () => painting = false);
+
+/* deep-link: ?view=participant opens the participant tab directly */
+if (location.search.includes('view=participant'))
+  document.querySelector('[data-view="participant"]').click();
+
+document.getElementById('submitBtn').addEventListener('click', function () {
+  this.textContent = '제출 완료 — 고마워요';
+  statusEl.innerHTML = '<span class="tick serif">✓</span><span>이름 없이 온도로만 전달됐어요. 결과가 나오면 알려 드릴게요.</span>';
+});
+</script>
+</body>
+</html>
