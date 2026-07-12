@@ -1,0 +1,589 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>겹 · Subframe — 묻지 않아도 아는 조율</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  /* ============================================================
+     SUBFRAME DESIGN SYSTEM — graphite blueprint on warm vellum
+     Strictly monochrome. Depth = lightness step + hairline, never shadow.
+     ============================================================ */
+  :root{
+    /* Colors */
+    --color-page-canvas:#fafafa;
+    --color-hairline-border:#e5e7eb;
+    --color-card-surface:#ededed;
+    --color-divider-mid:#dadada;
+    --color-graphite:#242424;
+    --color-ink-black:#171717;
+    --color-pencil:#5c5c5c;
+    --color-faint-graphite:#a3a3a3;
+
+    /* Typography */
+    --font-inter:"Inter",system-ui,-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+    --font-instrument-serif:"Instrument Serif","Playfair Display","DM Serif Display",Georgia,serif;
+
+    /* Type scale */
+    --text-body-sm:14px;
+    --text-body:18px;
+    --text-subheading:24px;
+    --text-heading:48px;
+    --text-display:128px;
+
+    /* Radius */
+    --r-control:16px;
+    --r-container:24px;
+    --r-pill:9999px;
+  }
+
+  *,*::before,*::after{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  html{background:var(--color-page-canvas)}
+  [hidden]{display:none !important}
+
+  body{
+    background:var(--color-page-canvas);
+    color:var(--color-ink-black);
+    font-family:var(--font-inter);
+    font-weight:500;
+    font-size:var(--text-body-sm);
+    line-height:1.6;
+    letter-spacing:-.07px;
+    -webkit-font-smoothing:antialiased;
+    word-break:keep-all;
+    overflow-wrap:break-word;
+  }
+  button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+  button:focus-visible,input:focus-visible,textarea:focus-visible,a:focus-visible{
+    outline:2px solid var(--color-graphite);outline-offset:3px;border-radius:8px;
+  }
+  input,textarea{font:inherit;color:inherit}
+  @media (prefers-reduced-motion:reduce){ *,*::before,*::after{transition:none !important;animation:none !important} }
+
+  .serif{font-family:var(--font-instrument-serif);font-weight:400;font-style:italic;letter-spacing:0}
+  .tn{font-variant-numeric:tabular-nums}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 32px}
+
+  /* ── Top bar ─────────────────────────────────────── */
+  .topbar{
+    position:sticky;top:0;z-index:60;
+    background:color-mix(in oklab,var(--color-page-canvas) 86%,transparent);
+    backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--color-hairline-border);
+  }
+  .topbar-in{max-width:1080px;margin:0 auto;padding:16px 32px;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+  .brand{display:flex;align-items:baseline;gap:10px}
+  .brand .mark{font-size:26px;font-weight:700;letter-spacing:-.06em;color:var(--color-ink-black)}
+  .brand .mark .serif{font-size:30px;letter-spacing:0}
+  .brand .tag{font-size:12px;color:var(--color-faint-graphite);letter-spacing:.02em}
+
+  /* Segmented pill control */
+  .seg{
+    margin-left:auto;display:inline-flex;gap:2px;padding:4px;
+    background:var(--color-card-surface);border-radius:var(--r-pill);
+  }
+  .seg button{
+    padding:8px 18px;border-radius:var(--r-pill);font-weight:600;font-size:13px;
+    color:var(--color-pencil);letter-spacing:-.01em;transition:color .18s;white-space:nowrap;
+  }
+  .seg button[aria-selected="true"]{
+    background:var(--color-graphite);color:var(--color-page-canvas);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.14);
+  }
+
+  /* ── View scaffolding ────────────────────────────── */
+  .view{padding:64px 0 96px;animation:rise .5s cubic-bezier(.2,.7,.2,1) both}
+  @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+  .eyebrow{
+    font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--color-faint-graphite);
+  }
+  .hero-title{
+    margin:16px 0 0;font-size:clamp(36px,6vw,var(--text-heading));line-height:1.13;
+    letter-spacing:-1.2px;font-weight:600;color:var(--color-ink-black);text-wrap:balance;
+  }
+  .hero-title .serif{font-size:1.14em;letter-spacing:0}
+  .hero-sub{margin:20px 0 0;font-size:var(--text-body);line-height:1.5;letter-spacing:-.45px;color:var(--color-pencil);max-width:34em}
+
+  .section-gap{height:56px}
+
+  /* ── Cards ───────────────────────────────────────── */
+  .card{background:var(--color-card-surface);border-radius:var(--r-container);padding:28px}
+  .card-plain{background:transparent;border:1px solid var(--color-hairline-border);border-radius:var(--r-container);padding:28px}
+  .card-label{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--color-faint-graphite)}
+
+  /* ── Buttons ─────────────────────────────────────── */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    height:52px;padding:0 26px;border-radius:var(--r-control);font-weight:600;font-size:15px;letter-spacing:-.01em;transition:transform .12s,background .18s}
+  .btn:active{transform:translateY(1px)}
+  .btn-fill{background:var(--color-graphite);color:var(--color-page-canvas);box-shadow:inset 0 1px 0 rgba(255,255,255,.16),inset 0 -1px 0 rgba(0,0,0,.25)}
+  .btn-fill:hover{background:#191919}
+  .btn-ghost{background:transparent;border:1px solid var(--color-hairline-border);color:var(--color-ink-black)}
+  .btn-ghost:hover{border-color:var(--color-divider-mid);background:var(--color-card-surface)}
+
+  /* ============================================================
+     PERSPECTIVE A — 참여자 (member input)
+     Painting availability across 3 gentle states. Monochrome only:
+     state is encoded by fill lightness + hatch pattern + line weight.
+     ============================================================ */
+  .a-layout{display:grid;grid-template-columns:1fr 340px;gap:32px;align-items:start}
+  @media (max-width:880px){.a-layout{grid-template-columns:1fr}}
+
+  /* Brush selector */
+  .brush-row{display:flex;flex-direction:column;gap:10px;margin-bottom:24px}
+  .brush{
+    display:flex;align-items:center;gap:14px;width:100%;text-align:left;
+    padding:14px 16px;border-radius:var(--r-control);border:1px solid var(--color-hairline-border);
+    background:transparent;transition:border-color .18s,background .18s;
+  }
+  .brush:hover{border-color:var(--color-divider-mid)}
+  .brush[aria-pressed="true"]{border-color:var(--color-graphite);background:#fff}
+  .brush .swatch{width:34px;height:34px;border-radius:10px;flex:none;border:1px solid var(--color-divider-mid)}
+  .brush .b-name{display:block;font-weight:600;font-size:15px;color:var(--color-ink-black)}
+  .brush .b-desc{display:block;font-size:12.5px;color:var(--color-pencil);margin-top:2px}
+  .brush .b-key{margin-left:auto;font-size:11px;font-weight:700;color:var(--color-faint-graphite);
+    border:1px solid var(--color-hairline-border);border-radius:8px;padding:3px 8px}
+
+  /* Swatch fills — the 3 states, monochrome */
+  .fill-yes{background:#fff}
+  .fill-soft{background:
+    repeating-linear-gradient(-45deg,transparent 0 4px,var(--color-faint-graphite) 4px 5px),
+    var(--color-card-surface);}
+  .fill-no{background:var(--color-graphite)}
+
+  /* Grid */
+  .grid-head{display:grid;grid-template-columns:56px repeat(5,1fr);gap:6px;margin-bottom:6px}
+  .grid-head .gh{font-size:12px;font-weight:600;color:var(--color-pencil);text-align:center;padding:2px 0}
+  .grid-head .gh small{display:block;font-size:10.5px;color:var(--color-faint-graphite);font-weight:600}
+  .grid-body{display:grid;grid-template-columns:56px repeat(5,1fr);gap:6px}
+  .row-time{font-size:11.5px;font-weight:600;color:var(--color-faint-graphite);display:flex;align-items:center;justify-content:flex-end;padding-right:8px}
+  .cell{
+    height:44px;border-radius:12px;border:1px solid var(--color-hairline-border);
+    background:#fff;cursor:pointer;position:relative;transition:transform .1s,border-color .15s;
+  }
+  .cell:hover{transform:scale(1.04);border-color:var(--color-divider-mid);z-index:1}
+  .cell[data-state="yes"]{background:#fff;border-color:var(--color-divider-mid)}
+  .cell[data-state="soft"]{
+    border-color:var(--color-divider-mid);
+    background:
+      repeating-linear-gradient(-45deg,transparent 0 5px,var(--color-faint-graphite) 5px 6.5px),
+      var(--color-card-surface);
+  }
+  .cell[data-state="no"]{background:var(--color-graphite);border-color:var(--color-graphite)}
+  .cell[data-state="no"]::after{
+    content:"";position:absolute;inset:0;
+    background:linear-gradient(-45deg,transparent 46%,rgba(250,250,250,.7) 47% 53%,transparent 54%);
+  }
+  .cell.locked{cursor:not-allowed;opacity:.5}
+  .cell.locked::before{content:"";position:absolute;inset:0;border-radius:11px;
+    background:repeating-linear-gradient(45deg,transparent 0 3px,var(--color-divider-mid) 3px 4px)}
+
+  /* Reassurance / privacy note */
+  .note{
+    display:flex;gap:12px;align-items:flex-start;padding:16px 18px;border-radius:var(--r-control);
+    background:var(--color-card-surface);
+  }
+  .note .ic{flex:none;width:22px;height:22px;color:var(--color-graphite)}
+  .note p{margin:0;font-size:13px;line-height:1.5;color:var(--color-pencil)}
+  .note b{color:var(--color-ink-black);font-weight:700}
+
+  .side-stack{display:flex;flex-direction:column;gap:20px;position:sticky;top:96px}
+  .tally{display:flex;flex-direction:column;gap:12px}
+  .tally-row{display:flex;align-items:center;gap:12px}
+  .tally-row .sw{width:20px;height:20px;border-radius:6px;flex:none;border:1px solid var(--color-divider-mid)}
+  .tally-row .lbl{font-size:13px;color:var(--color-pencil);font-weight:600}
+  .tally-row .cnt{margin-left:auto;font-weight:700;font-size:15px;color:var(--color-ink-black)}
+
+  .memo{margin-top:4px}
+  .memo label{display:block;font-size:12.5px;font-weight:600;color:var(--color-pencil);margin-bottom:8px}
+  .memo textarea{
+    width:100%;min-height:74px;resize:vertical;padding:12px 14px;border-radius:14px;
+    border:1px solid var(--color-hairline-border);background:#fff;font-size:14px;line-height:1.5;color:var(--color-ink-black);
+  }
+  .memo textarea::placeholder{color:var(--color-faint-graphite)}
+  .memo .hint{font-size:11.5px;color:var(--color-faint-graphite);margin-top:8px;line-height:1.5}
+
+  /* ============================================================
+     PERSPECTIVE B — 주최자 (organizer): recommended TOP 3
+     ============================================================ */
+  .rank-list{display:flex;flex-direction:column;gap:16px}
+  .rec{
+    display:grid;grid-template-columns:auto 1fr auto;gap:28px;align-items:center;
+    background:var(--color-card-surface);border-radius:var(--r-container);padding:28px 30px;
+  }
+  .rec.top{background:var(--color-graphite);color:var(--color-page-canvas);box-shadow:inset 0 1px 0 rgba(255,255,255,.1)}
+  @media (max-width:720px){.rec{grid-template-columns:1fr;gap:18px}}
+  .rank-num{font-family:var(--font-instrument-serif);font-weight:400;font-size:64px;line-height:.8;color:var(--color-faint-graphite)}
+  .rec.top .rank-num{color:rgba(250,250,250,.55)}
+  .rec-when .day{font-size:13px;font-weight:700;letter-spacing:.02em;color:var(--color-pencil)}
+  .rec.top .rec-when .day{color:rgba(250,250,250,.72)}
+  .rec-when .time{font-size:26px;font-weight:700;letter-spacing:-.03em;margin-top:4px;color:var(--color-ink-black)}
+  .rec.top .rec-when .time{color:var(--color-page-canvas)}
+  .rec-reasons{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .reason{
+    display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;
+    padding:7px 12px;border-radius:var(--r-pill);
+    border:1px solid var(--color-hairline-border);color:var(--color-pencil);background:#fff;
+  }
+  .rec.top .reason{border-color:rgba(250,250,250,.24);color:rgba(250,250,250,.9);background:transparent}
+  .reason svg{width:14px;height:14px;flex:none}
+
+  /* Consensus meter — grayscale "temperature", no color */
+  .meter{width:150px;flex:none}
+  @media (max-width:720px){.meter{width:100%}}
+  .meter .m-label{display:flex;justify-content:space-between;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--color-faint-graphite);margin-bottom:8px}
+  .rec.top .meter .m-label{color:rgba(250,250,250,.6)}
+  .meter .m-val{font-weight:700}
+  .rec .meter .m-val{color:var(--color-ink-black)}
+  .rec.top .meter .m-val{color:var(--color-page-canvas)}
+  .m-track{height:10px;border-radius:var(--r-pill);overflow:hidden;background:#fff;border:1px solid var(--color-divider-mid)}
+  .rec.top .m-track{background:rgba(250,250,250,.16);border-color:rgba(250,250,250,.28)}
+  .m-fill{height:100%;border-radius:var(--r-pill);
+    background:repeating-linear-gradient(90deg,var(--color-graphite) 0 6px,#3a3a3a 6px 8px)}
+  .rec.top .m-fill{background:repeating-linear-gradient(90deg,var(--color-page-canvas) 0 6px,#d4d4d4 6px 8px)}
+  .rec-cta{margin-top:16px}
+  .rec-cta .btn{height:46px;font-size:14px}
+
+  /* Aggregate heatmap (abstracted, individual reasons hidden) */
+  .heat-head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:20px}
+  .heat-grid{display:grid;grid-template-columns:56px repeat(5,1fr);gap:6px}
+  .heat-cell{height:40px;border-radius:11px;border:1px solid var(--color-hairline-border);position:relative}
+  .heat-legend{display:flex;align-items:center;gap:10px;margin-top:18px;font-size:12px;color:var(--color-pencil);font-weight:600}
+  .heat-legend .scale{display:flex;gap:4px}
+  .heat-legend .sc{width:26px;height:14px;border-radius:5px;border:1px solid var(--color-divider-mid)}
+
+  .kicker{font-size:13.5px;color:var(--color-pencil);line-height:1.6;max-width:52em}
+  .kicker b{color:var(--color-ink-black);font-weight:700}
+
+  footer{border-top:1px solid var(--color-hairline-border);margin-top:32px}
+  footer .wrap{padding-top:32px;padding-bottom:56px}
+  footer p{font-size:12.5px;color:var(--color-faint-graphite);margin:0;line-height:1.7}
+  footer .serif{color:var(--color-pencil);font-size:15px}
+</style>
+</head>
+<body>
+
+<!-- ══════════════ TOP BAR ══════════════ -->
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="brand">
+      <span class="mark">겹<span class="serif">, gyeop</span></span>
+      <span class="tag">여섯 명의 한 시간</span>
+    </div>
+    <div class="seg" role="tablist" aria-label="화면 전환">
+      <button role="tab" id="tab-a" aria-controls="view-a" aria-selected="true"  data-view="a">참여자 화면</button>
+      <button role="tab" id="tab-b" aria-controls="view-b" aria-selected="false" data-view="b">주최자 화면</button>
+    </div>
+  </div>
+</header>
+
+<!-- ══════════════ PERSPECTIVE A — 참여자 ══════════════ -->
+<main id="view-a" class="view" role="tabpanel" aria-labelledby="tab-a">
+  <div class="wrap">
+    <p class="eyebrow">참여자 · 가능한 시간 알려주기</p>
+    <h1 class="hero-title">말하기 어려운 시간도,<br><span class="serif">편안하게</span> 칠하세요.</h1>
+    <p class="hero-sub">‘안 된다’고 적기엔 눈치 보이던 시간이 있으셨죠. 여기선 <b style="color:var(--color-ink-black);font-weight:700">‘웬만하면 피하고 싶어요’</b>라고 부드럽게 말해도 돼요. 이유는 아무에게도 보이지 않아요.</p>
+
+    <div class="section-gap"></div>
+
+    <div class="a-layout">
+      <!-- LEFT: brush + grid -->
+      <section>
+        <div class="brush-row" role="group" aria-label="칠하기 모드 선택">
+          <button class="brush" data-brush="yes" aria-pressed="true">
+            <span class="swatch fill-yes"></span>
+            <span><span class="b-name">이 시간 좋아요</span><span class="b-desc">언제든 편하게 모여도 되는 시간</span></span>
+            <span class="b-key">1</span>
+          </button>
+          <button class="brush" data-brush="soft" aria-pressed="false">
+            <span class="swatch fill-soft"></span>
+            <span><span class="b-name">웬만하면 피하고 싶어요</span><span class="b-desc">되긴 하지만 마음이 조금 무거운 시간 (예: 점심 직후)</span></span>
+            <span class="b-key">2</span>
+          </button>
+          <button class="brush" data-brush="no" aria-pressed="false">
+            <span class="swatch fill-no"></span>
+            <span><span class="b-name">이때는 어려워요</span><span class="b-desc">정말 곤란한 시간. 이유는 적지 않아도 돼요</span></span>
+            <span class="b-key">3</span>
+          </button>
+        </div>
+
+        <div class="card" style="background:#fff;border:1px solid var(--color-hairline-border)">
+          <div class="grid-head" aria-hidden="true">
+            <div class="gh"></div>
+            <div class="gh">월<small>7/13</small></div>
+            <div class="gh">화<small>7/14</small></div>
+            <div class="gh">수<small>7/15</small></div>
+            <div class="gh">목<small>7/16</small></div>
+            <div class="gh">금<small>7/17</small></div>
+          </div>
+          <div class="grid-body" id="grid" aria-label="시간대 칠하기 그리드"></div>
+        </div>
+
+        <div style="height:20px"></div>
+        <div class="note">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="10" rx="2.5"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <p><b>주최자에게는 ‘가능한 정도’만 전해져요.</b> 누가 언제를 피하고 싶어 했는지, 그 이유가 무엇인지는 아무에게도 보이지 않아요. 여러 명의 응답이 하나의 흐릿한 농도로만 합쳐집니다.</p>
+        </div>
+      </section>
+
+      <!-- RIGHT: tally + memo -->
+      <aside class="side-stack">
+        <div class="card">
+          <p class="card-label" style="margin:0 0 16px">지금까지 칠한 시간</p>
+          <div class="tally">
+            <div class="tally-row"><span class="sw fill-yes"></span><span class="lbl">좋아요</span><span class="cnt tn" id="cnt-yes">0칸</span></div>
+            <div class="tally-row"><span class="sw fill-soft"></span><span class="lbl">피하고 싶어요</span><span class="cnt tn" id="cnt-soft">0칸</span></div>
+            <div class="tally-row"><span class="sw fill-no"></span><span class="lbl">어려워요</span><span class="cnt tn" id="cnt-no">0칸</span></div>
+          </div>
+        </div>
+
+        <div class="card memo">
+          <label for="memo">한마디 남기기 <span style="color:var(--color-faint-graphite);font-weight:500">(선택 · 나만 보여요)</span></label>
+          <textarea id="memo" placeholder="예) 목요일 오후는 아이 하원 때문에 마음이 급해요. 되도록이면 오전이 편해요."></textarea>
+          <p class="hint">여기 적은 메모는 <b style="color:var(--color-ink-black)">주최자에게 전달되지 않아요.</b> 다음에 응답할 때 스스로 참고하기 위한 기록이에요.</p>
+        </div>
+
+        <button class="btn btn-fill" style="width:100%">가능한 시간 보내기</button>
+      </aside>
+    </div>
+  </div>
+</main>
+
+<!-- ══════════════ PERSPECTIVE B — 주최자 ══════════════ -->
+<main id="view-b" class="view" role="tabpanel" aria-labelledby="tab-b" hidden>
+  <div class="wrap">
+    <p class="eyebrow">주최자 · 추천 회의 시간</p>
+    <h1 class="hero-title">6명의 일정을 계산했어요.<br>모두에게 <span class="serif">가장 편한</span> 세 시간이에요.</h1>
+    <p class="hero-sub">필수 참석자·외근 동선·피하고 싶은 시간대까지 함께 따져봤어요. 겹치는 빈칸을 직접 찾지 않아도 됩니다.</p>
+
+    <div class="section-gap"></div>
+
+    <div class="rank-list">
+      <!-- TOP 1 -->
+      <article class="rec top">
+        <div class="rank-num">01</div>
+        <div>
+          <div class="rec-when">
+            <div class="day">수요일 · 7월 15일</div>
+            <div class="time tn">오전 10:00 – 11:00</div>
+          </div>
+          <div class="rec-reasons">
+            <span class="reason"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>필수 참석자 4명 모두 가능</span>
+            <span class="reason"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>피하고 싶은 시간대 없음</span>
+            <span class="reason"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/></svg>오전이라 집중도 높음</span>
+          </div>
+          <div class="rec-cta"><button class="btn btn-fill">이 시간으로 정하기</button></div>
+        </div>
+        <div class="meter">
+          <div class="m-label"><span>합의 온도</span><span class="m-val tn">98°</span></div>
+          <div class="m-track"><div class="m-fill" style="width:98%"></div></div>
+        </div>
+      </article>
+
+      <!-- TOP 2 -->
+      <article class="rec">
+        <div class="rank-num">02</div>
+        <div>
+          <div class="rec-when">
+            <div class="day">화요일 · 7월 14일</div>
+            <div class="time tn">오후 4:00 – 5:00</div>
+          </div>
+          <div class="rec-reasons">
+            <span class="reason"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>필수 참석자 4명 모두 가능</span>
+            <span class="reason"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.3 3.9 2.4 18a1.8 1.8 0 0 0 1.6 2.7h16a1.8 1.8 0 0 0 1.6-2.7L13.7 3.9a1.9 1.9 0 0 0-3.4 0Z"/></svg>1명이 살짝 피하고 싶어함</span>
+            <span class="reason"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>외근 동선 정상</span>
+          </div>
+          <div class="rec-cta"><button class="btn btn-ghost">이 시간으로 정하기</button></div>
+        </div>
+        <div class="meter">
+          <div class="m-label"><span>합의 온도</span><span class="m-val tn">86°</span></div>
+          <div class="m-track"><div class="m-fill" style="width:86%"></div></div>
+        </div>
+      </article>
+
+      <!-- TOP 3 -->
+      <article class="rec">
+        <div class="rank-num">03</div>
+        <div>
+          <div class="rec-when">
+            <div class="day">금요일 · 7월 17일</div>
+            <div class="time tn">오전 11:00 – 12:00</div>
+          </div>
+          <div class="rec-reasons">
+            <span class="reason"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>필수 참석자 4명 모두 가능</span>
+            <span class="reason"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.3 3.9 2.4 18a1.8 1.8 0 0 0 1.6 2.7h16a1.8 1.8 0 0 0 1.6-2.7L13.7 3.9a1.9 1.9 0 0 0-3.4 0Z"/></svg>점심 직전이라 다소 촉박</span>
+            <span class="reason"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>선택 참석자 2명도 가능</span>
+          </div>
+          <div class="rec-cta"><button class="btn btn-ghost">이 시간으로 정하기</button></div>
+        </div>
+        <div class="meter">
+          <div class="m-label"><span>합의 온도</span><span class="m-val tn">79°</span></div>
+          <div class="m-track"><div class="m-fill" style="width:79%"></div></div>
+        </div>
+      </article>
+    </div>
+
+    <div class="section-gap"></div>
+
+    <!-- Aggregate heatmap -->
+    <section class="card-plain">
+      <div class="heat-head">
+        <div>
+          <p class="card-label" style="margin:0 0 8px">전체 가능 농도</p>
+          <p class="kicker" style="margin:0"><b>누가</b> 안 되는지는 표시되지 않아요. 6명의 응답이 하나의 <b>농도</b>로만 합쳐져, 짙을수록 더 많은 사람이 편하게 가능한 시간이에요.</p>
+        </div>
+      </div>
+      <div class="grid-head" aria-hidden="true">
+        <div class="gh"></div>
+        <div class="gh">월</div><div class="gh">화</div><div class="gh">수</div><div class="gh">목</div><div class="gh">금</div>
+      </div>
+      <div class="heat-grid" id="heat"></div>
+      <div class="heat-legend">
+        <span>비어 있음</span>
+        <span class="scale">
+          <span class="sc" style="background:#fff"></span>
+          <span class="sc" style="background:#e0e0e0"></span>
+          <span class="sc" style="background:#b5b5b5"></span>
+          <span class="sc" style="background:#6f6f6f"></span>
+          <span class="sc" style="background:var(--color-graphite)"></span>
+        </span>
+        <span>모두 가능</span>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p><span class="serif">겹, gyeop</span> — 여섯 명의 한 시간을 잡는 조율 서비스. Subframe 디자인 시스템(graphite blueprint on warm vellum) 기반, 무채색만으로 구성.</p>
+    <p style="margin-top:6px">관점 A는 감정적 마찰을 줄이는 응답 UI를, 관점 B는 주최자의 계산을 대신하는 추천 UI를 담았습니다.</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ── View switching ─────────────────────────────── */
+  var tabs = document.querySelectorAll('.seg button');
+  var views = {a:document.getElementById('view-a'), b:document.getElementById('view-b')};
+  tabs.forEach(function(t){
+    t.addEventListener('click', function(){
+      tabs.forEach(function(x){x.setAttribute('aria-selected','false')});
+      t.setAttribute('aria-selected','true');
+      var v = t.dataset.view;
+      Object.keys(views).forEach(function(k){ views[k].hidden = (k!==v); });
+      window.scrollTo({top:0,behavior:'smooth'});
+    });
+  });
+
+  /* ── Perspective A: paintable grid ──────────────── */
+  var TIMES = ['10:00','11:00','13:00','14:00','15:00','16:00','17:00'];
+  var DAYS = 5;
+  var grid = document.getElementById('grid');
+  var currentBrush = 'yes';
+  var painting = false;
+
+  // seed a natural-looking starting pattern
+  var seed = {
+    // "col-row": state
+    '2-2':'soft','3-2':'soft', // early afternoon post-lunch soft-avoid
+    '0-6':'no','1-6':'no',     // late friday-ish hard no
+    '4-0':'soft'
+  };
+
+  var brushes = document.querySelectorAll('.brush');
+  brushes.forEach(function(b){
+    b.addEventListener('click', function(){
+      brushes.forEach(function(x){x.setAttribute('aria-pressed','false')});
+      b.setAttribute('aria-pressed','true');
+      currentBrush = b.dataset.brush;
+    });
+  });
+  document.addEventListener('keydown', function(e){
+    var map = {'1':'yes','2':'soft','3':'no'};
+    if(map[e.key]){
+      currentBrush = map[e.key];
+      brushes.forEach(function(x){ x.setAttribute('aria-pressed', x.dataset.brush===currentBrush?'true':'false'); });
+    }
+  });
+
+  function paint(cell){
+    // toggle off if same state, else apply brush
+    if(cell.dataset.state === currentBrush){ cell.dataset.state = 'empty'; }
+    else { cell.dataset.state = currentBrush; }
+    tally();
+  }
+
+  for(var r=0;r<TIMES.length;r++){
+    var t = document.createElement('div');
+    t.className = 'row-time'; t.textContent = TIMES[r];
+    grid.appendChild(t);
+    for(var c=0;c<DAYS;c++){
+      var cell = document.createElement('button');
+      cell.className='cell';
+      cell.type='button';
+      var key = c+'-'+r;
+      cell.dataset.state = seed[key] || 'empty';
+      cell.setAttribute('aria-label', TIMES[r]+' '+['월','화','수','목','금'][c]);
+      (function(cell){
+        cell.addEventListener('mousedown', function(){ painting=true; paint(cell); });
+        cell.addEventListener('mouseenter', function(){ if(painting) paint(cell); });
+        cell.addEventListener('click', function(e){ /* click handled by mousedown; keep for keyboard */ });
+        cell.addEventListener('keydown', function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); paint(cell);} });
+      })(cell);
+      grid.appendChild(cell);
+    }
+  }
+  document.addEventListener('mouseup', function(){ painting=false; });
+
+  function tally(){
+    var counts = {yes:0,soft:0,no:0};
+    grid.querySelectorAll('.cell').forEach(function(c){
+      if(counts[c.dataset.state]!==undefined) counts[c.dataset.state]++;
+    });
+    document.getElementById('cnt-yes').textContent = counts.yes+'칸';
+    document.getElementById('cnt-soft').textContent = counts.soft+'칸';
+    document.getElementById('cnt-no').textContent = counts.no+'칸';
+  }
+  tally();
+
+  /* ── Perspective B: aggregate heatmap (grayscale density) ── */
+  var heat = document.getElementById('heat');
+  var HDAYS = 5, HROWS = 7;
+  var HTIMES = ['10','11','13','14','15','16','17'];
+  // density 0..6 (how many of 6 people are comfortably available)
+  var dens = [
+    [4,3,6,2,5],
+    [5,4,6,3,4],
+    [2,3,4,1,3], // post-lunch dip
+    [3,4,5,2,4],
+    [4,5,5,3,5],
+    [3,4,4,4,4],
+    [2,2,3,1,2]  // late day fade
+  ];
+  var shades = ['#ffffff','#ededed','#d6d6d6','#b5b5b5','#8a8a8a','#565656','#242424'];
+  for(var r2=0;r2<HROWS;r2++){
+    var tt = document.createElement('div');
+    tt.className='row-time'; tt.textContent = HTIMES[r2]+':00';
+    heat.appendChild(tt);
+    for(var c2=0;c2<HDAYS;c2++){
+      var hc = document.createElement('div');
+      hc.className='heat-cell';
+      var d = dens[r2][c2];
+      hc.style.background = shades[d];
+      if(d>=5) hc.style.borderColor = 'var(--color-graphite)';
+      hc.title = d+'/6명 가능';
+      hc.setAttribute('aria-label', HTIMES[r2]+'시 '+['월','화','수','목','금'][c2]+' — 6명 중 '+d+'명 가능');
+      heat.appendChild(hc);
+    }
+  }
+})();
+</script>
+</body>
+</html>
